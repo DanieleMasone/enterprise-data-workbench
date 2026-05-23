@@ -1,0 +1,12 @@
+{
+  "entryPoints": ["src/modules/workspace/index.ts"],
+  "out": "docs",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "treatWarningsAsErrors": true,
+  "categorizeByGroup": true,
+  "navigationLinks": {
+    "Repository": "https://github.com/"
+  }
+}

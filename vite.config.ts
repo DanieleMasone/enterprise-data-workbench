@@ -1,0 +1,36 @@
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vitest/config';
+
+const githubPagesBase = '/enterprise-data-workbench/';
+
+export default defineConfig({
+  base: process.env.VITE_BASE_PATH ?? githubPagesBase,
+  plugins: [react()],
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './vitest.setup.ts',
+    css: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'json-summary', 'lcov'],
+      reportsDirectory: 'coverage',
+      thresholds: {
+        branches: 65,
+        functions: 75,
+        lines: 75,
+        statements: 75,
+      },
+      exclude: [
+        'src/main.tsx',
+        'src/**/*.test.*',
+        'src/**/*.d.ts',
+        'src/vite-env.d.ts',
+      ],
+    },
+  },
+});
