@@ -14,7 +14,7 @@ Enterprise Data Workbench is a React, TypeScript and Vite application for dense,
 - Presence layer with fake collaborators and cursor locations.
 - Sync inspector for pending operations, conflicts and manual reconciliation.
 - Strict TypeScript, ESLint, Prettier, Vitest, Testing Library and TypeDoc.
-- GitHub Actions CI with coverage, generated docs artifacts, Vite production build and GitHub Pages deployment.
+- GitHub Actions CI with coverage generation, TypeDoc generation, Vite production build and GitHub Pages deployment.
 
 ## Feature Walkthrough
 
@@ -144,7 +144,7 @@ TypeDoc generates API documentation from exported domain, service, hook and stat
 npm run docs
 ```
 
-The generated `docs/` directory is uploaded as a CI artifact and intentionally excluded from git.
+The generated `docs/` directory is intentionally excluded from git. CI verifies documentation generation but only deploys the Vite production build to GitHub Pages.
 
 ## CI/CD
 
@@ -156,9 +156,7 @@ The GitHub Actions workflow runs on pull requests, pushes to `main` and manual d
 4. `npm run test:coverage`
 5. `npm run build`
 6. `npm run docs`
-7. coverage artifact upload
-8. generated documentation artifact upload
-9. GitHub Pages artifact upload and deployment for non-PR runs
+7. GitHub Pages artifact upload and deployment for non-PR runs
 
 The workflow uses the modern GitHub Pages Actions flow: `actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages`. The deployable artifact comes from Vite's `dist/` build.
 
