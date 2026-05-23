@@ -9,6 +9,7 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 - Route user intent through workspace commands in `state/workspace.store.ts`.
 - Use domain helpers in `domain/` for immutable selectors, operation creation and state mutation.
 - Keep persistence, synchronization and reconciliation behind `services/` boundaries.
+- Keep portfolio/showcase UI state, such as theme preference, outside the workspace document unless it affects domain behavior.
 
 ## Domain Terminology
 
@@ -48,6 +49,7 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 - Use Testing Library for user-visible UI behavior.
 - Use injected persistence and sync mocks for store tests.
 - Cover domain behavior, optimistic updates, reconciliation, keyboard workflows and practical table/kanban interactions.
+- Cover portfolio-shell behavior when adding visible showcase sections, theme controls or architecture/help panels.
 - Keep coverage thresholds meaningful; do not add snapshot-only tests to inflate coverage.
 
 ## CI/CD Expectations
@@ -60,9 +62,17 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 ## Documentation Expectations
 
 - Keep README.md aligned with the implemented product, not a wishlist.
+- Keep the README Mermaid diagram and the in-app architecture diagram aligned with the actual code paths.
 - Keep TypeDoc warning-free.
 - Export public option and parameter types referenced by public functions/classes.
 - Update AGENTS.md when architecture rules or terminology changes.
+
+## Portfolio UI Rules
+
+- The deployed app should communicate capability quickly: project pitch, feature panels, architecture, keyboard help and the live workspace must remain visible and responsive.
+- Prefer functional controls over decorative copy. Dark mode, command palette, conflict simulation and sync actions should be real.
+- Keep showcase sections full-width or grid-based; avoid nested cards and avoid duplicating workspace state for presentation.
+- Maintain accessible labels, focus states and keyboard paths for all new controls.
 
 ## Anti-Patterns To Avoid
 
@@ -72,6 +82,7 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 - Overbroad global state for transient component-only concerns.
 - Unbounded operation log spam from high-frequency pointer events.
 - Accessibility regressions in grid focus, editing and command palette flows.
+- README claims that are not implemented in the app or tests.
 
 ## Safe Extension Pattern
 

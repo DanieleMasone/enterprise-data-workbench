@@ -1,91 +1,194 @@
 # Enterprise Data Workbench
 
-Enterprise Data Workbench is a React, TypeScript and Vite application for dense, local-first data workflows. It demonstrates a domain-first architecture for editable records, multiple synchronized views, optimistic updates, mock collaboration, explicit sync state and conflict reconciliation.
+Enterprise Data Workbench is a portfolio-grade React, TypeScript and Vite application for dense, local-first enterprise data workflows. It showcases a domain-first frontend architecture where table, kanban and calendar views share one workspace document, every mutation is logged as an operation, and sync/reconciliation behavior is visible in the UI.
 
-## Features
+## Why This Project Exists
 
-- Data grid with inline cell editing, keyboard navigation, row selection, sorting, column resizing and column reordering.
-- Shared table, kanban and calendar views backed by one record model.
-- Command palette with keyboard-first view switching, sync and conflict simulation.
-- Local IndexedDB persistence through Dexie.
-- Explicit operation log with pending, acknowledged, conflicted and reverted states.
-- Mock synchronization service with optimistic updates and deterministic conflict simulation.
-- Reconciliation service for server acknowledgements, remote values and user-selected conflict resolution.
-- Presence layer with fake collaborators and cursor locations.
-- Sync inspector for pending operations, conflicts and manual reconciliation.
-- Strict TypeScript, ESLint, Prettier, Vitest, Testing Library and TypeDoc.
-- GitHub Actions CI with coverage generation, TypeDoc generation, Vite production build and GitHub Pages deployment.
+Enterprise frontends often fail at the places where simple CRUD examples stop: dense editing, overlapping interaction state, optimistic updates, local persistence, keyboard ergonomics, conflict handling and deployment discipline. This project packages those concerns into one inspectable GitHub Pages app.
 
 ## Feature Walkthrough
 
-The first screen is the workbench itself. The table view is the primary editing surface: select cells, press `Enter` to edit, commit with `Enter` or cancel with `Escape`, move with arrow keys, and use `Tab` or `Shift+Tab` to move horizontally. Column headers expose sorting, resize handles and reorder controls.
+- **Portfolio showcase shell:** first-viewport project pitch, feature panels, live workspace metrics, keyboard help and an architecture diagram.
+- **Data grid:** inline cell editing, keyboard navigation, row selection, sorting, column resizing and column reordering.
+- **Shared views:** table, kanban and calendar project the same `WorkbenchRecord` model without duplicated per-view data.
+- **Command palette:** `Ctrl/Cmd K` opens view switching, sync and conflict simulation commands.
+- **Local-first persistence:** the workspace snapshot is persisted in IndexedDB through Dexie.
+- **Optimistic updates:** local commands append `WorkspaceOperation` records and update the UI immediately.
+- **Mock synchronization:** pending operations are submitted to a mock sync service that can acknowledge or conflict.
+- **Reconciliation:** conflict records preserve local and remote values until the user resolves them.
+- **Presence layer:** deterministic fake collaborators show cursor locations and collaboration pressure.
+- **Sync inspector:** visible sync mode, pending operations, operation history, conflict simulation and resolution controls.
+- **Theme:** dark/light mode toggle with persisted `localStorage` preference.
+- **Tooling:** strict TypeScript, ESLint, Prettier, Vitest, Testing Library, coverage and TypeDoc.
 
-The kanban view groups the same records by `status`. Moving a card writes a `record.status.move` operation into the shared operation log, so the table and calendar immediately reflect the change.
+## Architecture Diagram
 
-The calendar view groups the same records by `dueDate`. It intentionally stays simple: records are bucketed by date from the domain model rather than copied into a calendar-specific store.
+```mermaid
+flowchart LR
+  subgraph UI["Published React UI"]
+    Shell["Portfolio shell\nfeature panels, theme, keyboard help"]
+    Grid["DataGrid"]
+    Kanban["KanbanView"]
+    Calendar["CalendarView"]
+    Palette["CommandPalette"]
+    Inspector["SyncInspector"]
+  end
 
-The sync inspector shows the operation queue, current sync mode, open conflicts and reconciliation actions. Conflict indicators also appear directly on affected grid cells.
+  subgraph State["Shared workspace state"]
+    Store["Zustand WorkspaceStore"]
+    Document["WorkspaceDocument\nfields, fieldOrder, records"]
+    Interaction["Interaction state\nselection, editing, sort, active view"]
+    Operations["Operation log\npending, acknowledged, conflicted, reverted"]
+    Conflicts["Conflict model\nlocal value, remote value, resolution"]
+  end
+
+  subgraph Domain["Domain layer"]
+    Commands["Workspace commands"]
+    Factory["WorkspaceOperationFactory"]
+    Mutations["Immutable mutations and selectors"]
+  end
+
+  subgraph Boundaries["Local-first boundaries"]
+    Persistence["Dexie IndexedDB persistence"]
+    Sync["MockWorkspaceSyncService"]
+    Reconcile["Reconciliation service"]
+  end
+
+  subgraph Delivery["CI/CD"]
+    Actions["GitHub Actions\nnpm ci, typecheck, lint, coverage, build, docs"]
+    Pages["GitHub Pages\nVite dist artifact"]
+  end
+
+  Shell --> Grid
+  Shell --> Kanban
+  Shell --> Calendar
+  Shell --> Palette
+  Shell --> Inspector
+  Grid --> Commands
+  Kanban --> Commands
+  Calendar --> Store
+  Palette --> Commands
+  Inspector --> Commands
+  Commands --> Factory
+  Factory --> Operations
+  Commands --> Mutations
+  Mutations --> Store
+  Store --> Document
+  Store --> Interaction
+  Store --> Operations
+  Store --> Conflicts
+  Store --> Persistence
+  Operations --> Sync
+  Sync --> Reconcile
+  Reconcile --> Store
+  Actions --> Pages
+```
+
+The same architecture is rendered inside the published application as a compact HTML diagram.
+
+## Domain Model
+
+The workspace is modeled around domain data rather than UI widgets:
+
+- `WorkspaceField` describes column metadata, field type, width and categorical options.
+- `WorkbenchRecord` stores serializable cell values plus record timestamps and version.
+- `WorkspaceOperation` captures user mutations for optimistic UI, persistence, replay and inspection.
+- `WorkspaceConflict` stores field-level local/remote disagreement until resolution.
+- `SyncStatus` reports mode, pending count, last sync time and errors.
+
+Views consume selectors over `WorkspaceDocument`; they do not own separate record caches.
+
+## Sync And Reconciliation
+
+Local commands apply immediately and append a pending operation. The store persists the snapshot, then `flushSync` submits pending operations to `WorkspaceSyncService`. The mock service returns acknowledgements, remote operations and conflicts. `reconcileSyncResult` updates operation status, merges conflicts and keeps remote reconciliation explicit. Users can keep the optimistic local value or accept the remote value in the sync inspector.
 
 ## Keyboard UX
 
-- Arrow keys: move selected cell.
-- `Enter`: start editing the selected cell.
-- `Enter` while editing: commit the draft value.
-- `Escape` while editing: cancel and restore the original value.
-- `Tab` / `Shift+Tab`: move horizontally through cells.
+- Arrow keys: move selected grid cell.
+- `Enter`: start editing or commit the draft value.
+- `Escape`: cancel editing or close the command palette.
+- `Tab` / `Shift+Tab`: move horizontally through grid cells.
 - `Ctrl+K` / `Cmd+K`: open the command palette.
 - `Ctrl+S` / `Cmd+S`: flush pending sync operations.
 
-Focus is managed so the selected grid cell remains keyboard-addressable after navigation and editing transitions.
+Focus is restored to the selected cell after navigation and editing transitions.
 
-## Architecture
+## Screenshots And GIFs
 
-```text
-src/
-  app/
-    App.tsx
-  modules/
-    workspace/
-      components/
-        DataGrid/
-        KanbanView/
-        CalendarView/
-        CommandPalette/
-        PresenceLayer/
-        SyncInspector/
-      data/
-      domain/
-      hooks/
-      model/
-      services/
-      state/
-      test/
-  styles.css
+Real screenshots are not committed yet. Suggested showcase captures:
+
+- `docs-assets/table-editing.gif`: inline edit, pending operation, sync acknowledgement.
+- `docs-assets/conflict-resolution.gif`: simulate conflict, compare local/remote values, resolve.
+- `docs-assets/responsive-pages.png`: GitHub Pages view across desktop and mobile widths.
+
+## Testing Strategy
+
+Vitest runs with Testing Library and jsdom. The suite covers:
+
+- domain selectors, immutable mutations and operation creation
+- optimistic updates and workspace store commands
+- reconciliation and conflict resolution
+- persistence boundaries with mocks and fake IndexedDB
+- inline editing commit/cancel flows
+- keyboard shortcut hooks and grid navigation
+- command palette filtering/execution
+- table selection, sorting and column reordering
+- kanban movement logic
+- calendar projection logic
+- sync inspector operation/conflict behavior
+- portfolio shell and dark mode persistence
+
+Coverage is generated by `npm run test:coverage` and CI. Generated coverage output is ignored.
+
+Current thresholds:
+
+- statements: 75%
+- branches: 65%
+- functions: 75%
+- lines: 75%
+
+## CI/CD
+
+The GitHub Actions workflow runs on pull requests, pushes to `main` and manual dispatches:
+
+1. `npm ci`
+2. `npm run typecheck`
+3. `npm run lint`
+4. `npm run test:coverage`
+5. `npm run build`
+6. `npm run docs`
+7. Upload Vite `dist/` as a GitHub Pages artifact on non-PR runs
+8. Deploy through `actions/deploy-pages`
+
+The workflow follows the current GitHub Pages custom workflow model: `actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages`.
+
+References:
+
+- [GitHub Pages custom workflows](https://docs.github.com/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
+- [GitHub Pages publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
+- [Vite GitHub Pages deployment](https://vite.dev/guide/static-deploy.html#github-pages)
+
+## GitHub Pages Deployment
+
+Vite is configured for the project page base path:
+
+```ts
+base: process.env.VITE_BASE_PATH ?? '/enterprise-data-workbench/'
 ```
 
-### Domain Model
+Enable GitHub Pages in repository settings by selecting **GitHub Actions** as the Pages source. CI builds the app and deploys only the Vite `dist/` artifact. Manual build artifacts are not committed.
 
-Records are stored as `WorkbenchRecord` objects with typed field metadata and serializable cell values. Views derive their presentation from the same document:
+## Documentation
 
-- `fields`
-- `fieldOrder`
-- `records`
-- `operationLog`
-- `conflicts`
-- `sync`
-- explicit interaction state for selection, editing, sorting and active view
+TypeDoc generates API documentation from exported workspace domain, service, hook and state modules:
 
-There is no duplicated per-view data store. UI handlers call workspace commands; commands create domain operations; operations mutate the document optimistically; persistence and sync run at explicit service boundaries.
+```bash
+npm run docs
+```
 
-### Synchronization And Reconciliation
+Generated `docs/` output is ignored and is used only as a validation artifact.
 
-Local edits are applied immediately and appended to the operation log as `pending`. The mock sync service acknowledges successful operations and can produce deterministic conflicts. Reconciliation updates operation status, merges remote operations and stores open conflicts separately from the optimistic record value. Users can resolve conflicts by keeping the local value or accepting the remote value.
-
-### Persistence
-
-`DexieWorkspacePersistence` stores the serializable workspace snapshot in IndexedDB. Tests use in-memory persistence mocks to verify the boundary without coupling store tests to IndexedDB.
-
-## Setup
+## Local Setup
 
 Use Node 22 or newer.
 
@@ -94,7 +197,7 @@ npm ci
 npm run dev
 ```
 
-The development server runs with Vite. For local production verification:
+Preview the production build locally:
 
 ```bash
 npm run build
@@ -113,99 +216,30 @@ npm run preview
 - `npm run docs` - generate TypeDoc output in `docs/`.
 - `npm run ci` - run typecheck, lint, coverage, build and docs locally.
 
-Generated `dist/`, `coverage/` and `docs/` output is ignored and should not be committed.
-
-## Testing And Coverage
-
-Vitest runs with Testing Library and jsdom. The suite covers:
-
-- domain selectors and mutations
-- operation creation and optimistic state updates
-- inline editing commit and cancel flows
-- keyboard navigation
-- table row selection, sorting and column reordering
-- kanban status movement logic
-- command palette filtering and execution
-- sync acknowledgements and conflict reconciliation
-- persistence boundaries using mocks and a fake IndexedDB-backed Dexie test
-
-Coverage is generated in CI and locally through `npm run test:coverage`. Current thresholds are:
-
-- statements: 75%
-- branches: 65%
-- functions: 75%
-- lines: 75%
-
-## Documentation
-
-TypeDoc generates API documentation from exported domain, service, hook and state modules:
-
-```bash
-npm run docs
-```
-
-The generated `docs/` directory is intentionally excluded from git. CI verifies documentation generation but only deploys the Vite production build to GitHub Pages.
-
-## CI/CD
-
-The GitHub Actions workflow runs on pull requests, pushes to `main` and manual dispatches. It performs:
-
-1. `npm ci`
-2. `npm run typecheck`
-3. `npm run lint`
-4. `npm run test:coverage`
-5. `npm run build`
-6. `npm run docs`
-7. GitHub Pages artifact upload and deployment for non-PR runs
-
-The workflow uses the modern GitHub Pages Actions flow: `actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages`. The deployable artifact comes from Vite's `dist/` build.
-
-Reference guidance:
-
-- [GitHub Pages with custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
-- [GitHub Actions Pages deployment](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms)
-- [Vite static deployment guide](https://vite.dev/guide/static-deploy.html#github-pages)
-
-## GitHub Pages Deployment
-
-Vite is configured with the repository base path:
-
-```ts
-base: process.env.VITE_BASE_PATH ?? '/enterprise-data-workbench/'
-```
-
-CI sets `VITE_BASE_PATH=/enterprise-data-workbench/` before building for Pages. No generated build artifacts need to be committed.
-
-To enable deployment in GitHub:
-
-1. Open repository settings.
-2. Go to Pages.
-3. Set Source to GitHub Actions.
-4. Push to `main` or run the workflow manually.
-
 ## Performance Considerations
 
-- Views derive data with memoized selectors and avoid duplicating records.
-- Mutations are immutable and scoped to affected fields or records.
-- The operation log makes expensive synchronization work explicit.
-- The current grid is suitable for moderate enterprise datasets. Very large datasets should add row and column virtualization.
+- Derived projections keep the table, kanban and calendar views aligned with one document.
+- Mutations are immutable and scoped to affected fields, records or layout state.
+- Column resize commits on pointer release to avoid flooding the operation log.
+- The current grid is suitable for moderate datasets. Very large datasets should add row and column virtualization.
+- Sync work is explicit and inspectable, which makes future batching or backoff strategies straightforward.
 
 ## Technical Trade-Offs
 
-- Collaboration is mocked. It demonstrates presence, operation queues and conflicts without WebSockets or CRDTs.
-- Conflict resolution is field-level and deterministic. A production backend would need authorization, server versions and richer merge policies.
-- Calendar rendering is a compact grouped-date projection rather than a full scheduling engine.
-- Column resizing commits on pointer release to keep the operation log useful instead of recording every pointer move.
+- Collaboration is mocked. It demonstrates presence, pending operations and conflicts without WebSockets or CRDTs.
+- Conflict resolution is field-level and deterministic. Production synchronization would need server versions, authz and richer merge policies.
+- Calendar rendering is a compact due-date grouping rather than a full scheduling engine.
+- The architecture diagram in the app is HTML/CSS for zero runtime diagram dependency; README uses Mermaid.
 
 ## Future Improvements
 
-- Real-time collaboration via WebSockets.
+- Row and column virtualization for large datasets.
+- Real-time collaboration transport.
 - CRDT-backed merge semantics.
-- Virtualized rendering for very large tables.
+- Undo/redo using the existing operation envelopes.
 - Multi-workspace routing and permissions.
-- Undo/redo powered by the existing operation envelopes.
-- Visual regression tests for dense grid states.
+- Visual regression coverage for dense grid states.
 
 ## Project Status
 
-The README specification has been implemented as a stable frontend demonstration project with CI, tests, documentation generation and GitHub Pages deployment configuration.
+Implemented as a stable senior frontend portfolio showcase with a polished GitHub Pages UI, production validation pipeline, local-first architecture, documented trade-offs and meaningful automated tests.

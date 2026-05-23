@@ -79,6 +79,7 @@ function KanbanColumn({ option, records, allOptions, onMove }: KanbanColumnProps
         <strong>{records.length}</strong>
       </header>
       <div className="kanban-column-list">
+        {records.length === 0 ? <p className="empty-column">No records in this status</p> : null}
         {records.map((record) => (
           <KanbanCard
             key={record.id}

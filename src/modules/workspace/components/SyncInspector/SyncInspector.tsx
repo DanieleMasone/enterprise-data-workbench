@@ -15,6 +15,7 @@ export function SyncInspector() {
   const simulateRemoteConflict = useWorkspaceSelector((store) => store.simulateRemoteConflict);
   const syncMutation = useOptimisticMutation(useCallback(() => flushSync(), [flushSync]));
   const pendingOperations = operationLog.filter((operation) => operation.status === 'pending');
+  const recentOperations = operationLog.slice(-6).reverse();
   const openConflicts = conflicts.filter((conflict) => conflict.status === 'open');
 
   return (
@@ -78,6 +79,19 @@ export function SyncInspector() {
             <li key={operation.id}>
               <span>{operation.type}</span>
               <code>{operation.id}</code>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="inspector-section" aria-label="Operation log">
+        <h3>Operation log</h3>
+        {recentOperations.length === 0 ? <p className="muted">No operations recorded yet</p> : null}
+        <ol className="operation-list">
+          {recentOperations.map((operation) => (
+            <li key={operation.id}>
+              <span>{operation.type}</span>
+              <code>{operation.status}</code>
             </li>
           ))}
         </ol>

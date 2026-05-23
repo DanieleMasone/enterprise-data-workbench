@@ -170,6 +170,13 @@ export function DataGrid() {
         </div>
       </div>
 
+      {sortedRecords.length === 0 ? (
+        <div className="empty-state" role="status">
+          <strong>No records available</strong>
+          <span>The shared workspace document is empty.</span>
+        </div>
+      ) : null}
+
       <div className="data-grid-shell" onKeyDown={handleGridKeyDown}>
         <table className="data-grid" role="grid" aria-rowcount={sortedRecords.length}>
           <thead>

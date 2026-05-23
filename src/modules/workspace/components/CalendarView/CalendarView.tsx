@@ -18,6 +18,12 @@ export function CalendarView() {
 
   return (
     <section className="workspace-view" aria-label="Calendar view">
+      {sortedDates.length === 0 ? (
+        <div className="empty-state" role="status">
+          <strong>No scheduled records</strong>
+          <span>Add due dates to records to populate this projection.</span>
+        </div>
+      ) : null}
       <div className="calendar-board">
         {sortedDates.map((date) => (
           <section key={date} className="calendar-day" aria-label={date}>
