@@ -2,6 +2,11 @@
 
 Enterprise Data Workbench is a portfolio-grade React, TypeScript and Vite application for dense, local-first enterprise data workflows. It showcases a domain-first frontend architecture where table, kanban and calendar views share one workspace document, every mutation is logged as an operation, and sync/reconciliation behavior is visible in the UI.
 
+- **Live demo:** [danielemasone.github.io/enterprise-data-workbench](https://danielemasone.github.io/enterprise-data-workbench/)
+- **Source:** [github.com/danielemasone/enterprise-data-workbench](https://github.com/danielemasone/enterprise-data-workbench)
+- **Generated API docs:** [GitHub Pages TypeDoc report](https://danielemasone.github.io/enterprise-data-workbench/docs/)
+- **Coverage report:** [GitHub Pages coverage report](https://danielemasone.github.io/enterprise-data-workbench/coverage/)
+
 ## Why This Project Exists
 
 Enterprise frontends often fail at the places where simple CRUD examples stop: dense editing, overlapping interaction state, optimistic updates, local persistence, keyboard ergonomics, conflict handling and deployment discipline. This project packages those concerns into one inspectable GitHub Pages app.
@@ -18,7 +23,7 @@ Enterprise frontends often fail at the places where simple CRUD examples stop: d
 - **Reconciliation:** conflict records preserve local and remote values until the user resolves them.
 - **Presence layer:** deterministic fake collaborators show cursor locations and collaboration pressure.
 - **Sync inspector:** visible sync mode, pending operations, operation history, conflict simulation and resolution controls.
-- **Theme:** dark/light mode toggle with persisted `localStorage` preference.
+- **Theme:** dark/light mode toggle that respects system preference on first load and persists explicit `localStorage` preference.
 - **Tooling:** strict TypeScript, ESLint, Prettier, Vitest, Testing Library, coverage and TypeDoc.
 
 ## Architecture Diagram
@@ -158,7 +163,8 @@ The GitHub Actions workflow runs on pull requests, pushes to `main` and manual d
 5. `npm run build`
 6. `npm run docs`
 7. Upload Vite `dist/` as a GitHub Pages artifact on non-PR runs
-8. Deploy through `actions/deploy-pages`
+8. Copy generated TypeDoc and coverage reports into `dist/docs/` and `dist/coverage/`
+9. Deploy through `actions/deploy-pages`
 
 The workflow follows the current GitHub Pages custom workflow model: `actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages`.
 
@@ -176,7 +182,7 @@ Vite is configured for the project page base path:
 base: process.env.VITE_BASE_PATH ?? '/enterprise-data-workbench/'
 ```
 
-Enable GitHub Pages in repository settings by selecting **GitHub Actions** as the Pages source. CI builds the app and deploys only the Vite `dist/` artifact. Manual build artifacts are not committed.
+Enable GitHub Pages in repository settings by selecting **GitHub Actions** as the Pages source. CI builds the app, generates docs and coverage, copies those generated reports into the Vite artifact, and deploys only `dist/`. Manual build artifacts are not committed.
 
 ## Documentation
 
@@ -186,7 +192,7 @@ TypeDoc generates API documentation from exported workspace domain, service, hoo
 npm run docs
 ```
 
-Generated `docs/` output is ignored and is used only as a validation artifact.
+Generated `docs/` output is ignored. On non-PR CI runs it is copied into `dist/docs/` so the published app can link to stable API documentation.
 
 ## Local Setup
 
@@ -214,7 +220,8 @@ npm run preview
 - `npm run typecheck` - run strict TypeScript checking.
 - `npm run lint` - run ESLint with zero warnings allowed.
 - `npm run docs` - generate TypeDoc output in `docs/`.
-- `npm run ci` - run typecheck, lint, coverage, build and docs locally.
+- `npm run pages:reports` - copy generated `coverage/` and `docs/` into `dist/` for Pages publishing.
+- `npm run ci` - run typecheck, lint, coverage, build, docs and Pages report assembly locally.
 
 ## Performance Considerations
 

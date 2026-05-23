@@ -13,8 +13,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "docs": "typedoc",
+    "pages:reports": "node scripts/copy-pages-reports.mjs",
     "format": "prettier . --write",
-    "ci": "npm run typecheck && npm run lint && npm run test:coverage && npm run build && npm run docs"
+    "ci": "npm run typecheck && npm run lint && npm run test:coverage && npm run build && npm run docs && npm run pages:reports"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

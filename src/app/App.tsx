@@ -1,9 +1,12 @@
 import {
   Activity,
+  BookOpen,
   CalendarDays,
   CheckCircle2,
   Columns3,
   Command,
+  ExternalLink,
+  FileText,
   GitBranch,
   Keyboard,
   Layers3,
@@ -39,6 +42,8 @@ const viewLabels: Readonly<Record<WorkspaceViewMode, string>> = {
 type ThemeMode = 'light' | 'dark';
 
 const themeStorageKey = 'enterprise-data-workbench-theme';
+const githubRepositoryUrl = 'https://github.com/danielemasone/enterprise-data-workbench';
+const pagesBasePath = import.meta.env.BASE_URL;
 
 const featurePanels = [
   {
@@ -68,6 +73,33 @@ const featurePanels = [
   },
 ] as const;
 
+const resourceLinks = [
+  {
+    label: 'GitHub',
+    description: 'Source repository',
+    href: githubRepositoryUrl,
+    icon: GitBranch,
+  },
+  {
+    label: 'README',
+    description: 'Architecture and setup',
+    href: `${githubRepositoryUrl}#readme`,
+    icon: BookOpen,
+  },
+  {
+    label: 'TypeDoc',
+    description: 'Generated API docs',
+    href: `${pagesBasePath}docs/`,
+    icon: FileText,
+  },
+  {
+    label: 'Coverage',
+    description: 'Generated test report',
+    href: `${pagesBasePath}coverage/`,
+    icon: Activity,
+  },
+] as const;
+
 const shortcuts = [
   ['Arrow keys', 'Move selected grid cell'],
   ['Enter', 'Edit or commit selected cell'],
@@ -92,6 +124,7 @@ export function WorkspaceApplication() {
   const hydrated = useWorkspaceSelector((store) => store.hydrated);
   const activeView = useWorkspaceSelector((store) => store.activeView);
   const setActiveView = useWorkspaceSelector((store) => store.setActiveView);
+  const commandPaletteOpen = useWorkspaceSelector((store) => store.commandPaletteOpen);
   const setCommandPaletteOpen = useWorkspaceSelector((store) => store.setCommandPaletteOpen);
   const flushSync = useWorkspaceSelector((store) => store.flushSync);
   const pendingCount = useWorkspaceSelector((store) => store.sync.pendingCount);
@@ -171,6 +204,8 @@ export function WorkspaceApplication() {
             className="command-button"
             onClick={openCommandPalette}
             aria-label="Open command palette"
+            aria-expanded={commandPaletteOpen}
+            aria-controls="workspace-command-palette"
           >
             <Command size={16} aria-hidden="true" />
             <span>Command</span>
@@ -202,10 +237,7 @@ export function WorkspaceApplication() {
 }
 
 function usePersistedTheme(): readonly [ThemeMode, (theme: ThemeMode) => void] {
-  const [theme, setThemeState] = useState<ThemeMode>(() => {
-    const storedTheme = window.localStorage.getItem(themeStorageKey);
-    return storedTheme === 'dark' || storedTheme === 'light' ? storedTheme : 'light';
-  });
+  const [theme, setThemeState] = useState<ThemeMode>(resolveInitialTheme);
 
   const setTheme = useCallback((nextTheme: ThemeMode) => {
     setThemeState(nextTheme);
@@ -213,6 +245,15 @@ function usePersistedTheme(): readonly [ThemeMode, (theme: ThemeMode) => void] {
   }, []);
 
   return [theme, setTheme];
+}
+
+function resolveInitialTheme(): ThemeMode {
+  const storedTheme = window.localStorage.getItem(themeStorageKey);
+  if (storedTheme === 'dark' || storedTheme === 'light') {
+    return storedTheme;
+  }
+
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 interface ShowcaseOverviewProps {
@@ -259,6 +300,19 @@ function ShowcaseOverview({
           </article>
         ))}
       </div>
+
+      <nav className="resource-link-grid" aria-label="Project resources">
+        {resourceLinks.map(({ label, description, href, icon: Icon }) => (
+          <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={`${label}: ${description}`}>
+            <Icon size={18} aria-hidden="true" />
+            <span>
+              <strong>{label}</strong>
+              <small>{description}</small>
+            </span>
+            <ExternalLink size={15} aria-hidden="true" />
+          </a>
+        ))}
+      </nav>
 
       <div className="showcase-lower-grid">
         <ArchitectureDiagram />

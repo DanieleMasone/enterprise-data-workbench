@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WorkspaceStoreProvider } from '../modules/workspace/state';
 import { createTestWorkspaceStore } from '../modules/workspace/test/createTestStore';
 import { WorkspaceApplication } from './App';
@@ -8,6 +8,19 @@ import { WorkspaceApplication } from './App';
 describe('workspace application shell', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockReturnValue({
+        matches: false,
+        media: '(prefers-color-scheme: dark)',
+        onchange: null,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }),
+    });
   });
 
   it('renders the portfolio showcase, architecture diagram and workspace after hydration', async () => {
@@ -22,7 +35,43 @@ describe('workspace application shell', () => {
     expect(await screen.findByRole('heading', { name: /enterprise data workbench/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /runtime architecture/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /keyboard shortcuts/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /github: source repository/i })).toHaveAttribute(
+      'href',
+      'https://github.com/danielemasone/enterprise-data-workbench',
+    );
+    expect(screen.getByRole('link', { name: /typedoc: generated api docs/i })).toHaveAttribute(
+      'href',
+      '/docs/',
+    );
+    expect(screen.getByRole('link', { name: /coverage: generated test report/i })).toHaveAttribute(
+      'href',
+      '/coverage/',
+    );
     expect(screen.getByLabelText('Sync inspector')).toBeInTheDocument();
+  });
+
+  it('respects the system dark preference before the user chooses a theme', async () => {
+    vi.mocked(window.matchMedia).mockReturnValue({
+      matches: true,
+      media: '(prefers-color-scheme: dark)',
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    });
+    const { store } = createTestWorkspaceStore();
+
+    const { container } = render(
+      <WorkspaceStoreProvider store={store}>
+        <WorkspaceApplication />
+      </WorkspaceStoreProvider>,
+    );
+
+    await screen.findByRole('heading', { name: /enterprise data workbench/i });
+
+    expect(container.querySelector('.app-shell')).toHaveAttribute('data-theme', 'dark');
   });
 
   it('persists the dark mode preference from the header toggle', async () => {
@@ -42,5 +91,28 @@ describe('workspace application shell', () => {
       expect(container.querySelector('.app-shell')).toHaveAttribute('data-theme', 'dark');
     });
     expect(window.localStorage.getItem('enterprise-data-workbench-theme')).toBe('dark');
+  });
+
+  it('announces command palette expanded state from the trigger', async () => {
+    const user = userEvent.setup();
+    const { store } = createTestWorkspaceStore();
+
+    render(
+      <WorkspaceStoreProvider store={store}>
+        <WorkspaceApplication />
+      </WorkspaceStoreProvider>,
+    );
+
+    await screen.findByRole('heading', { name: /enterprise data workbench/i });
+    const trigger = screen.getByRole('button', { name: /open command palette/i });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    await user.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('dialog', { name: /command palette/i })).toHaveAttribute(
+      'id',
+      'workspace-command-palette',
+    );
   });
 });

@@ -48,6 +48,10 @@ jobs:
       - name: Generate API documentation
         run: npm run docs
 
+      - name: Attach generated reports to Pages artifact
+        if: github.event_name != 'pull_request'
+        run: npm run pages:reports
+
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5

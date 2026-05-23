@@ -123,6 +123,7 @@ export function CommandPalette() {
   return (
     <div className="command-palette-backdrop" role="presentation" onMouseDown={() => setOpen(false)}>
       <section
+        id="workspace-command-palette"
         className="command-palette"
         role="dialog"
         aria-modal="true"

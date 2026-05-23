@@ -20,6 +20,10 @@ export function SyncInspector() {
 
   return (
     <aside className="sync-inspector" aria-label="Sync inspector">
+      <p className="sr-only" aria-live="polite">
+        Sync status is {sync.mode}. {pendingOperations.length} pending operations and{' '}
+        {openConflicts.length} open conflicts.
+      </p>
       <header>
         <ServerCog size={19} aria-hidden="true" />
         <div>

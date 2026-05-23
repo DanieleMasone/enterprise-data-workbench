@@ -56,13 +56,14 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 
 - `npm run ci` should remain the local validation equivalent of CI.
 - GitHub Actions must run install, typecheck, lint, coverage, build and docs.
-- Pages deployments must publish the Vite `dist/` artifact from CI.
+- Pages deployments must publish the Vite `dist/` artifact from CI and include generated `dist/docs/` and `dist/coverage/` reports.
 - Avoid deprecated actions and warning-heavy dependency choices.
 
 ## Documentation Expectations
 
 - Keep README.md aligned with the implemented product, not a wishlist.
 - Keep the README Mermaid diagram and the in-app architecture diagram aligned with the actual code paths.
+- Keep live demo, TypeDoc and coverage links stable when deployment paths change.
 - Keep TypeDoc warning-free.
 - Export public option and parameter types referenced by public functions/classes.
 - Update AGENTS.md when architecture rules or terminology changes.
@@ -71,8 +72,10 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 
 - The deployed app should communicate capability quickly: project pitch, feature panels, architecture, keyboard help and the live workspace must remain visible and responsive.
 - Prefer functional controls over decorative copy. Dark mode, command palette, conflict simulation and sync actions should be real.
+- Dark mode must respect system preference on first load, persist explicit user preference and preserve contrast in both themes.
 - Keep showcase sections full-width or grid-based; avoid nested cards and avoid duplicating workspace state for presentation.
 - Maintain accessible labels, focus states and keyboard paths for all new controls.
+- Do not add visible buttons, links or controls unless they perform the advertised action or are explicitly disabled with a useful reason.
 
 ## Anti-Patterns To Avoid
 
@@ -91,4 +94,5 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 3. Expose a store command with injected service boundaries where needed.
 4. Render the feature from derived workspace state.
 5. Add tests for domain logic, state mutation and the user-facing workflow.
-6. Run `npm run typecheck`, `npm run lint`, `npm run test:coverage`, `npm run build` and `npm run docs`.
+6. Remove temporary code, dead exports, stale TODOs, generated artifacts and misleading documentation claims.
+7. Run `npm run typecheck`, `npm run lint`, `npm run test:coverage`, `npm run build` and `npm run docs`.
