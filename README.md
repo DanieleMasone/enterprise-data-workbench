@@ -238,15 +238,6 @@ npm run preview
 - Calendar rendering is a compact due-date grouping rather than a full scheduling engine.
 - The architecture diagram in the app is HTML/CSS for zero runtime diagram dependency; README uses Mermaid.
 
-## Future Improvements
-
-- Row and column virtualization for large datasets.
-- Real-time collaboration transport.
-- CRDT-backed merge semantics.
-- Undo/redo using the existing operation envelopes.
-- Multi-workspace routing and permissions.
-- Visual regression coverage for dense grid states.
-
 ## Project Status
 
 Implemented as a stable senior frontend portfolio showcase with a polished GitHub Pages UI, production validation pipeline, local-first architecture, documented trade-offs and meaningful automated tests.
