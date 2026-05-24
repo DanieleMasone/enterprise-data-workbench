@@ -35,6 +35,7 @@ describe('workspace application shell', () => {
     expect(await screen.findByRole('heading', { name: /enterprise data workbench/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /runtime architecture/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /keyboard shortcuts/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /data-heavy workbench/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /github: source repository/i })).toHaveAttribute(
       'href',
       'https://github.com/danielemasone/enterprise-data-workbench',
@@ -48,6 +49,70 @@ describe('workspace application shell', () => {
       '/coverage/',
     );
     expect(screen.getByLabelText('Sync inspector')).toBeInTheDocument();
+  });
+
+  it('switches Table, Kanban and Calendar as accessible workbench tabs', async () => {
+    const user = userEvent.setup();
+    const { store } = createTestWorkspaceStore();
+
+    render(
+      <WorkspaceStoreProvider store={store}>
+        <WorkspaceApplication />
+      </WorkspaceStoreProvider>,
+    );
+
+    await screen.findByRole('heading', { name: /enterprise data workbench/i });
+    const tableTab = screen.getByRole('tab', { name: 'Table' });
+    const kanbanTab = screen.getByRole('tab', { name: 'Kanban' });
+    const calendarTab = screen.getByRole('tab', { name: 'Calendar' });
+
+    expect(tableTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel', { name: 'Table' })).toBeInTheDocument();
+    expect(screen.getByRole('grid')).toBeInTheDocument();
+
+    await user.click(kanbanTab);
+
+    expect(kanbanTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel', { name: 'Kanban' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Kanban view')).toBeInTheDocument();
+    expect(screen.queryByRole('grid')).not.toBeInTheDocument();
+
+    await user.click(calendarTab);
+
+    expect(calendarTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel', { name: 'Calendar' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Calendar view')).toBeInTheDocument();
+  });
+
+  it('supports keyboard activation across workbench tabs', async () => {
+    const user = userEvent.setup();
+    const { store } = createTestWorkspaceStore();
+
+    render(
+      <WorkspaceStoreProvider store={store}>
+        <WorkspaceApplication />
+      </WorkspaceStoreProvider>,
+    );
+
+    await screen.findByRole('heading', { name: /enterprise data workbench/i });
+    const tableTab = screen.getByRole('tab', { name: 'Table' });
+    const kanbanTab = screen.getByRole('tab', { name: 'Kanban' });
+    const calendarTab = screen.getByRole('tab', { name: 'Calendar' });
+
+    tableTab.focus();
+    await user.keyboard('{ArrowRight}');
+
+    await waitFor(() => {
+      expect(kanbanTab).toHaveAttribute('aria-selected', 'true');
+    });
+    expect(kanbanTab).toHaveFocus();
+
+    await user.keyboard('{End}');
+
+    await waitFor(() => {
+      expect(calendarTab).toHaveAttribute('aria-selected', 'true');
+    });
+    expect(calendarTab).toHaveFocus();
   });
 
   it('respects the system dark preference before the user chooses a theme', async () => {

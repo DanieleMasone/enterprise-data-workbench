@@ -13,7 +13,7 @@ Enterprise frontends often fail at the places where simple CRUD examples stop: d
 
 ## Feature Walkthrough
 
-- **Portfolio showcase shell:** first-viewport project pitch, feature panels, live workspace metrics, keyboard help and an architecture diagram.
+- **Portfolio showcase shell:** first-viewport project pitch, feature panels, live workspace metrics, a workbench-local tabbed demo, keyboard help and an architecture diagram.
 - **Data grid:** inline cell editing, keyboard navigation, row selection, sorting, column resizing and column reordering.
 - **Shared views:** table, kanban and calendar project the same `WorkbenchRecord` model without duplicated per-view data.
 - **Command palette:** `Ctrl/Cmd K` opens view switching, sync and conflict simulation commands.
@@ -162,8 +162,8 @@ The GitHub Actions workflow runs on pull requests, pushes to `main` and manual d
 4. `npm run test:coverage`
 5. `npm run build`
 6. `npm run docs`
-7. Upload Vite `dist/` as a GitHub Pages artifact on non-PR runs
-8. Copy generated TypeDoc and coverage reports into `dist/docs/` and `dist/coverage/`
+7. Copy generated TypeDoc and coverage reports into `dist/docs/` and `dist/coverage/`
+8. Upload Vite `dist/` as a GitHub Pages artifact on non-PR runs
 9. Deploy through `actions/deploy-pages`
 
 The workflow follows the current GitHub Pages custom workflow model: `actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages`.

@@ -19,6 +19,7 @@
   --danger: #c2410c;
   --info: #0f6e9f;
   --shadow: 0 16px 40px rgb(15 23 42 / 12%);
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 8%);
   --app-bg: #f4f6f8;
   --text: #172033;
   --button-text: #243044;
@@ -88,6 +89,7 @@ button:disabled {
   --danger: #fb923c;
   --info: #7dd3fc;
   --shadow: 0 18px 42px rgb(0 0 0 / 38%);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%);
   --app-bg: #0b1120;
   --text: #e5edf8;
   --button-text: #e5edf8;
@@ -108,8 +110,11 @@ button:disabled {
 }
 
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto minmax(220px, auto);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 18px;
   padding: 14px 18px;
@@ -155,13 +160,6 @@ button:disabled {
   font-size: 0.82rem;
 }
 
-.view-tabs {
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--border);
-  background: var(--surface-subtle);
-}
-
 .view-tabs button,
 .command-button,
 .theme-toggle,
@@ -180,8 +178,8 @@ button:disabled {
 }
 
 .view-tabs button {
-  min-width: 92px;
-  padding: 0 10px;
+  min-width: 96px;
+  padding: 0 12px;
 }
 
 .view-tabs button.is-active {
@@ -234,19 +232,45 @@ button:disabled {
   background: var(--hover);
 }
 
-.showcase-overview {
+.page-main {
   display: grid;
-  gap: 14px;
+  width: min(100%, 1480px);
+  margin: 0 auto;
   padding: 18px;
-  border-bottom: 1px solid var(--border);
-  background: var(--hero-bg);
+  gap: 18px;
 }
 
-.showcase-hero {
+.hero-section {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr);
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.68fr);
   gap: 18px;
   align-items: stretch;
+}
+
+.capability-section,
+.workbench-section,
+.quality-section,
+.architecture-panel,
+.keyboard-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.workbench-section,
+.capability-section,
+.quality-section,
+.architecture-panel,
+.keyboard-panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.capability-section,
+.quality-section,
+.architecture-panel,
+.keyboard-panel {
+  padding: 16px;
 }
 
 .hero-copy {
@@ -288,6 +312,65 @@ button:disabled {
   line-height: 1.55;
 }
 
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section-title-group {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.section-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--accent);
+}
+
+.section-eyebrow {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--accent-strong);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.section-header p {
+  max-width: 720px;
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.section-actions {
+  flex: 0 0 auto;
+}
+
+.view-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+}
+
 .hero-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -295,9 +378,7 @@ button:disabled {
 }
 
 .metric-tile,
-.feature-panel,
-.architecture-panel,
-.keyboard-panel {
+.feature-panel {
   border: 1px solid var(--border);
   background: var(--surface);
 }
@@ -392,35 +473,6 @@ button:disabled {
   gap: 10px;
 }
 
-.architecture-panel,
-.keyboard-panel {
-  display: grid;
-  gap: 14px;
-  padding: 16px;
-}
-
-.section-heading {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.section-heading svg {
-  color: var(--accent);
-  margin-top: 2px;
-}
-
-.section-heading h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.section-heading p {
-  margin: 3px 0 0;
-  color: var(--text-muted);
-  font-size: 0.84rem;
-}
-
 .architecture-flow {
   display: grid;
   grid-template-columns: minmax(120px, 1fr) auto minmax(140px, 1fr) auto minmax(140px, 1fr) auto minmax(140px, 1fr);
@@ -489,6 +541,31 @@ button:disabled {
   font-size: 0.8rem;
 }
 
+.quality-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quality-card {
+  display: grid;
+  gap: 6px;
+  min-height: 92px;
+  border: 1px solid var(--border);
+  background: var(--surface-subtle);
+  padding: 12px;
+}
+
+.quality-card strong {
+  font-size: 0.92rem;
+}
+
+.quality-card span {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
 .presence-layer {
   justify-content: space-between;
   gap: 16px;
@@ -523,9 +600,13 @@ button:disabled {
 
 .workspace-layout {
   display: grid;
-  flex: 1;
   grid-template-columns: minmax(0, 1fr) 330px;
-  min-height: 0;
+  min-height: 560px;
+  border-top: 1px solid var(--border);
+}
+
+.workbench-section {
+  overflow: hidden;
 }
 
 .workspace-main {
@@ -1092,21 +1173,38 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
+  .section-header {
+    display: grid;
+  }
+
+  .section-actions {
+    width: 100%;
+  }
+
   .view-tabs,
   .header-actions {
     justify-content: flex-start;
   }
 
-  .workspace-layout {
-    grid-template-columns: 1fr;
+  .view-tabs {
+    width: 100%;
   }
 
-  .showcase-hero,
+  .workspace-layout {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .hero-section,
   .showcase-lower-grid {
     grid-template-columns: 1fr;
   }
 
   .feature-panel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quality-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1134,9 +1232,13 @@ button:disabled {
     padding: 12px;
   }
 
+  .page-main {
+    padding: 12px;
+    gap: 12px;
+  }
+
   .presence-layer,
-  .app-header,
-  .showcase-overview {
+  .app-header {
     padding-inline: 12px;
   }
 
@@ -1148,6 +1250,7 @@ button:disabled {
 
   .view-tabs button {
     min-width: 0;
+    min-height: 44px;
   }
 
   .command-button span,
@@ -1156,8 +1259,13 @@ button:disabled {
     display: none;
   }
 
+  .header-actions {
+    flex-wrap: wrap;
+  }
+
   .hero-metrics,
-  .feature-panel-grid {
+  .feature-panel-grid,
+  .quality-grid {
     grid-template-columns: 1fr;
   }
 
