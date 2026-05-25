@@ -5,6 +5,9 @@ const port = process.env.PLAYWRIGHT_PORT ?? '4173';
 const basePath = process.env.VITE_BASE_PATH ?? '/enterprise-data-workbench/';
 const baseURL = `http://${host}:${port}`;
 const appURL = `${baseURL}${basePath}`;
+const previewCommand = `npm run preview -- --host ${host} --port ${port}`;
+const webServerCommand =
+  process.env.PLAYWRIGHT_WEB_SERVER_COMMAND ?? `npm run build && ${previewCommand}`;
 
 export default defineConfig({
   testDir: './e2e',
@@ -24,7 +27,7 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   webServer: {
-    command: `npm run build && npm run preview -- --host ${host} --port ${port}`,
+    command: webServerCommand,
     env: {
       VITE_BASE_PATH: basePath,
     },

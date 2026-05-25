@@ -60,8 +60,9 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 - `npm run ci` should remain the local validation equivalent of CI.
 - GitHub Actions must run install, Playwright browser install, typecheck, lint, coverage, build, docs and Playwright E2E.
 - Pages deployments must publish the Vite `dist/` artifact from CI and include generated `dist/docs/` and `dist/coverage/` reports.
-- Upload Playwright reports as CI artifacts; keep `playwright-report/`, `test-results/` and traces out of git.
-- Avoid deprecated actions and warning-heavy dependency choices.
+- Keep the workflow simple: one validation/build job, one Pages deploy job, and deployment only from non-PR `main` runs.
+- Upload Playwright reports as short-retention CI artifacts on failure; keep `playwright-report/`, `test-results/` and traces out of git.
+- Check official GitHub action release notes before changing action majors. Avoid obsolete actions, deprecated actions and warning-heavy dependency choices.
 
 ## Documentation Expectations
 

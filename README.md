@@ -156,7 +156,7 @@ Playwright covers browser-level behavior that jsdom cannot validate well:
 - GitHub, TypeDoc and coverage link targets
 - mobile horizontal-overflow and touch-target sanity checks
 
-Playwright reports are generated in `playwright-report/`, ignored locally and uploaded as CI artifacts. Vitest remains the coverage gate for domain, state and component logic; Playwright is intentionally lean and focused on integrated user flows.
+Playwright reports are generated in `playwright-report/`, ignored locally and uploaded as short-retention CI artifacts only when a workflow fails. Vitest remains the coverage gate for domain, state and component logic; Playwright is intentionally lean and focused on integrated user flows.
 
 Current thresholds:
 
@@ -167,7 +167,7 @@ Current thresholds:
 
 ## CI/CD
 
-The GitHub Actions workflow runs on pull requests, pushes to `main` and manual dispatches:
+The GitHub Actions workflow runs on pull requests, pushes to `main` and manual dispatches. Pull requests run the full validation suite without deployment. Pushes and manual dispatches on `main` also publish the GitHub Pages artifact.
 
 1. `npm ci`
 2. `npx playwright install --with-deps chromium`
@@ -177,12 +177,12 @@ The GitHub Actions workflow runs on pull requests, pushes to `main` and manual d
 6. `npm run build`
 7. `npm run docs`
 8. `npm run test:e2e`
-9. Copy generated TypeDoc and coverage reports into `dist/docs/` and `dist/coverage/`
-10. Upload Vite `dist/` as a GitHub Pages artifact on non-PR runs
+9. Copy generated TypeDoc and coverage reports into `dist/docs/` and `dist/coverage/` on deployable `main` runs
+10. Upload Vite `dist/` as a GitHub Pages artifact
 11. Deploy through `actions/deploy-pages`
 
 The workflow follows the current GitHub Pages custom workflow model: `actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages`.
-It installs Playwright Chromium with `npx playwright install --with-deps chromium` and uploads the Playwright HTML report with `actions/upload-artifact`.
+It uses Node 24 in CI, `actions/setup-node` npm caching, the latest stable official action majors, and uploads the Playwright HTML report with `actions/upload-artifact` only on failure.
 
 References:
 
@@ -212,7 +212,7 @@ Generated `docs/` output is ignored. On non-PR CI runs it is copied into `dist/d
 
 ## Local Setup
 
-Use Node 22 or newer.
+Use Node 22.12 or newer. CI validates with Node 24.
 
 ```bash
 npm ci
