@@ -50,13 +50,17 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 - Use injected persistence and sync mocks for store tests.
 - Cover domain behavior, optimistic updates, reconciliation, keyboard workflows and practical table/kanban interactions.
 - Cover portfolio-shell behavior when adding visible showcase sections, theme controls or architecture/help panels.
+- Use Playwright for integrated browser behavior: production preview smoke, desktop/mobile layout, keyboard command palette, persisted theme, real tab switching, sync/conflict flows and stable public links.
+- Keep Playwright lean. Do not duplicate domain permutations already covered by Vitest.
+- Avoid E2E flakes: prefer role/label locators, deterministic seeded data, no external navigation, no fixed sleeps and no assertions that depend on animation timing.
 - Keep coverage thresholds meaningful; do not add snapshot-only tests to inflate coverage.
 
 ## CI/CD Expectations
 
 - `npm run ci` should remain the local validation equivalent of CI.
-- GitHub Actions must run install, typecheck, lint, coverage, build and docs.
+- GitHub Actions must run install, Playwright browser install, typecheck, lint, coverage, build, docs and Playwright E2E.
 - Pages deployments must publish the Vite `dist/` artifact from CI and include generated `dist/docs/` and `dist/coverage/` reports.
+- Upload Playwright reports as CI artifacts; keep `playwright-report/`, `test-results/` and traces out of git.
 - Avoid deprecated actions and warning-heavy dependency choices.
 
 ## Documentation Expectations
@@ -95,4 +99,4 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 4. Render the feature from derived workspace state.
 5. Add tests for domain logic, state mutation and the user-facing workflow.
 6. Remove temporary code, dead exports, stale TODOs, generated artifacts and misleading documentation claims.
-7. Run `npm run typecheck`, `npm run lint`, `npm run test:coverage`, `npm run build` and `npm run docs`.
+7. Run `npm run typecheck`, `npm run lint`, `npm run test:coverage`, `npm run build`, `npm run docs` and `npm run test:e2e`.
