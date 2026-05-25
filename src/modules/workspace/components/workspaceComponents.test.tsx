@@ -6,7 +6,7 @@ import { DataGrid } from './DataGrid';
 import { CalendarView } from './CalendarView';
 import { KanbanView } from './KanbanView';
 import { SyncInspector } from './SyncInspector';
-import { WorkspaceStoreProvider } from '../state/WorkspaceStoreProvider';
+import { WorkspaceStoreProvider } from '../state';
 import { createTestWorkspaceStore } from '../test/createTestStore';
 
 describe('workspace components', () => {
@@ -28,7 +28,8 @@ describe('workspace components', () => {
 
     await waitFor(() => {
       expect(
-        store.getState().records.find((record) => record.id === 'rec-revenue-dashboard')?.cells.owner,
+        store.getState().records.find((record) => record.id === 'rec-revenue-dashboard')?.cells
+          .owner,
       ).toBe('Alex');
     });
     expect(store.getState().operationLog.at(-1)?.type).toBe('cell.update');
@@ -93,10 +94,13 @@ describe('workspace components', () => {
       </WorkspaceStoreProvider>,
     );
 
-    await user.click(screen.getByRole('button', { name: /move regulatory export workflow to delivery/i }));
+    await user.click(
+      screen.getByRole('button', { name: /move regulatory export workflow to delivery/i }),
+    );
 
     expect(
-      store.getState().records.find((record) => record.id === 'rec-compliance-export')?.cells.status,
+      store.getState().records.find((record) => record.id === 'rec-compliance-export')?.cells
+        .status,
     ).toBe('Delivery');
   });
 
@@ -151,9 +155,7 @@ describe('workspace components', () => {
     const { store } = createTestWorkspaceStore();
     await store.getState().hydrate();
     await store.getState().updateCell('rec-analytics-migration', 'owner', 'Rae');
-    store
-      .getState()
-      .simulateRemoteConflict('rec-analytics-migration', 'owner', 'Remote owner');
+    store.getState().simulateRemoteConflict('rec-analytics-migration', 'owner', 'Remote owner');
 
     render(
       <WorkspaceStoreProvider store={store}>
@@ -167,7 +169,8 @@ describe('workspace components', () => {
     await user.click(screen.getByRole('button', { name: 'Remote' }));
 
     expect(
-      store.getState().records.find((record) => record.id === 'rec-analytics-migration')?.cells.owner,
+      store.getState().records.find((record) => record.id === 'rec-analytics-migration')?.cells
+        .owner,
     ).toBe('Remote owner');
   });
 });

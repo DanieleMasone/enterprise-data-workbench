@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createInitialWorkspace } from '../data/initialWorkspace';
-import type { WorkspaceOperation } from '../model/operation.types';
+import type { WorkspaceOperation } from '../model';
 import { applyOperation, reorderFields, resizeField, updateRecordCell } from './workspaceMutations';
 
 describe('workspace mutations', () => {
@@ -39,9 +39,9 @@ describe('workspace mutations', () => {
 
     const updated = applyOperation(workspace, operation);
 
-    expect(updated.records.find((record) => record.id === 'rec-pricing-rules')?.cells.priority).toBe(
-      'High',
-    );
+    expect(
+      updated.records.find((record) => record.id === 'rec-pricing-rules')?.cells.priority,
+    ).toBe('High');
   });
 
   it('honors minimum field widths and reorders fields deterministically', () => {

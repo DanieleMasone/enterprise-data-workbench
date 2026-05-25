@@ -1,8 +1,7 @@
 import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { createInitialWorkspace } from '../data/initialWorkspace';
-import { WorkspaceOperationFactory } from '../domain/operationFactory';
-import { applyOperation } from '../domain/workspaceMutations';
 import {
+  applyOperation,
   findField,
   findRecord,
   formatFieldValue,
@@ -11,13 +10,24 @@ import {
   getPendingOperationsForCell,
   parseFieldValue,
   sortRecords,
-} from '../domain/workspaceSelectors';
-import type { CellAddress, RecordId } from '../model/record.types';
-import type { PersistedWorkspace, PresenceUser } from '../model/sync.types';
-import type { WorkspaceState, WorkspaceStore, WorkspaceDependencies } from '../model/workspace.types';
-import { DexieWorkspacePersistence } from '../services/persistence.service';
-import { createManualConflict, reconcileSyncResult, resolveWorkspaceConflict } from '../services/reconciliation.service';
-import { MockWorkspaceSyncService } from '../services/sync.service';
+  WorkspaceOperationFactory,
+} from '../domain';
+import type {
+  CellAddress,
+  PersistedWorkspace,
+  PresenceUser,
+  RecordId,
+  WorkspaceState,
+  WorkspaceStore,
+  WorkspaceDependencies,
+} from '../model';
+import {
+  createManualConflict,
+  DexieWorkspacePersistence,
+  MockWorkspaceSyncService,
+  reconcileSyncResult,
+  resolveWorkspaceConflict,
+} from '../services';
 
 /** Bound Zustand hook returned by the workspace store factory. */
 export type WorkspaceStoreHook = UseBoundStore<StoreApi<WorkspaceStore>>;
@@ -94,7 +104,9 @@ export function createWorkspaceStore(
           commandPaletteOpen: false,
           sync: {
             ...workspace.sync,
-            pendingCount: workspace.operationLog.filter((operation) => operation.status === 'pending').length,
+            pendingCount: workspace.operationLog.filter(
+              (operation) => operation.status === 'pending',
+            ).length,
           },
           presence: createPresence(workspace, dependencies.now()),
           hydrated: true,
@@ -269,7 +281,9 @@ export function createWorkspaceStore(
 
       flushSync: async () => {
         const state = get();
-        const pendingOperations = state.operationLog.filter((operation) => operation.status === 'pending');
+        const pendingOperations = state.operationLog.filter(
+          (operation) => operation.status === 'pending',
+        );
         if (pendingOperations.length === 0) {
           return;
         }
@@ -324,18 +338,26 @@ export function createWorkspaceStore(
           conflicts: [...current.conflicts, conflict],
           operationLog: pendingOperation
             ? current.operationLog.map((operation) =>
-                operation.id === pendingOperation.id ? { ...operation, status: 'conflicted' } : operation,
-              )
+              operation.id === pendingOperation.id
+                ? { ...operation, status: 'conflicted' }
+                : operation,
+            )
             : current.operationLog,
           sync: {
             ...current.sync,
-            pendingCount: current.operationLog.filter((operation) => operation.status === 'pending').length,
+            pendingCount: current.operationLog.filter((operation) => operation.status === 'pending')
+              .length,
           },
         }));
       },
 
       resolveConflict: async (conflictId, resolution) => {
-        const reconciled = resolveWorkspaceConflict(get(), conflictId, resolution, dependencies.now());
+        const reconciled = resolveWorkspaceConflict(
+          get(),
+          conflictId,
+          resolution,
+          dependencies.now(),
+        );
         set(reconciled);
         await persist();
       },

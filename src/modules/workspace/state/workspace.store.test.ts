@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createInitialWorkspace } from '../data/initialWorkspace';
-import { createManualConflict } from '../services/reconciliation.service';
+import { createManualConflict } from '../services';
 import { createTestWorkspaceStore } from '../test/createTestStore';
 
 describe('workspace store', () => {
@@ -21,12 +21,12 @@ describe('workspace store', () => {
       records: seeded.records.map((record, index) =>
         index === 0
           ? {
-              ...record,
-              cells: {
-                ...record.cells,
-                owner: 'Loaded owner',
-              },
-            }
+            ...record,
+            cells: {
+              ...record.cells,
+              owner: 'Loaded owner',
+            },
+          }
           : record,
       ),
     };
@@ -50,9 +50,10 @@ describe('workspace store', () => {
     expect(updated?.cells.owner).toBe('Sam');
     expect(store.getState().operationLog[0]?.status).toBe('pending');
     expect(store.getState().sync.pendingCount).toBe(1);
-    expect(persistence.savedSnapshots.at(-1)?.records.find((record) => record.id === updated?.id)?.cells.owner).toBe(
-      'Sam',
-    );
+    expect(
+      persistence.savedSnapshots.at(-1)?.records.find((record) => record.id === updated?.id)?.cells
+        .owner,
+    ).toBe('Sam');
   });
 
   it('supports inline editing commit and cancel flows', async () => {
@@ -126,7 +127,8 @@ describe('workspace store', () => {
     await store.getState().moveRecordToStatus('rec-compliance-export', 'Delivery');
 
     expect(
-      store.getState().records.find((record) => record.id === 'rec-compliance-export')?.cells.status,
+      store.getState().records.find((record) => record.id === 'rec-compliance-export')?.cells
+        .status,
     ).toBe('Delivery');
     expect(store.getState().operationLog[0]?.type).toBe('record.status.move');
   });

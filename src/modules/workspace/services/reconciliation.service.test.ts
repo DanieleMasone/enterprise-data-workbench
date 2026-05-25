@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { createTestWorkspaceStore } from '../test/createTestStore';
-import { createManualConflict, reconcileSyncResult, resolveWorkspaceConflict } from './reconciliation.service';
+import {
+  createManualConflict,
+  reconcileSyncResult,
+  resolveWorkspaceConflict,
+} from './reconciliation.service';
 
 describe('reconciliation service', () => {
   it('acknowledges submitted operations and clears pending sync status', async () => {
@@ -45,18 +49,16 @@ describe('reconciliation service', () => {
 
     expect(reconciled.operationLog[0]?.status).toBe('conflicted');
     expect(reconciled.conflicts[0]?.remoteValue).toBe('Remote title');
-    expect(reconciled.records.find((record) => record.id === 'rec-compliance-export')?.cells.title).toBe(
-      'Conflict candidate',
-    );
+    expect(
+      reconciled.records.find((record) => record.id === 'rec-compliance-export')?.cells.title,
+    ).toBe('Conflict candidate');
   });
 
   it('can resolve a conflict by accepting the remote value', async () => {
     const { store } = createTestWorkspaceStore();
     await store.getState().hydrate();
     await store.getState().updateCell('rec-compliance-export', 'title', 'Local title');
-    store
-      .getState()
-      .simulateRemoteConflict('rec-compliance-export', 'title', 'Remote title');
+    store.getState().simulateRemoteConflict('rec-compliance-export', 'title', 'Remote title');
 
     const conflict = store.getState().conflicts[0];
     expect(conflict).toBeDefined();
@@ -69,8 +71,8 @@ describe('reconciliation service', () => {
 
     expect(resolved.conflicts[0]?.status).toBe('resolved');
     expect(resolved.operationLog[0]?.status).toBe('reverted');
-    expect(resolved.records.find((record) => record.id === 'rec-compliance-export')?.cells.title).toBe(
-      'Remote title',
-    );
+    expect(
+      resolved.records.find((record) => record.id === 'rec-compliance-export')?.cells.title,
+    ).toBe('Remote title');
   });
 });

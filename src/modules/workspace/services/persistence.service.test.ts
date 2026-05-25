@@ -4,7 +4,10 @@ import { DexieWorkspacePersistence } from './persistence.service';
 
 describe('Dexie workspace persistence', () => {
   it('saves, loads, and clears the persisted workspace document', async () => {
-    const persistence = new DexieWorkspacePersistence(`test-db-${crypto.randomUUID()}`, 'workspace');
+    const persistence = new DexieWorkspacePersistence(
+      `test-db-${crypto.randomUUID()}`,
+      'workspace',
+    );
     const workspace = createInitialWorkspace();
 
     await persistence.save(workspace);

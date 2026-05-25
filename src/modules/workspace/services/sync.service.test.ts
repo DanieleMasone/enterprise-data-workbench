@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createInitialWorkspace } from '../data/initialWorkspace';
-import type { WorkspaceOperation } from '../model/operation.types';
+import type { WorkspaceOperation } from '../model';
 import { MockWorkspaceSyncService } from './sync.service';
 
 describe('mock workspace sync service', () => {

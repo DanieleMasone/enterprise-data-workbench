@@ -1,5 +1,5 @@
 import { MousePointer2 } from 'lucide-react';
-import { useWorkspaceSelector } from '../../state/WorkspaceStoreProvider';
+import { useWorkspaceSelector } from '../../state';
 
 /** Lightweight collaboration facade that renders deterministic fake cursors and user presence. */
 export function PresenceLayer() {

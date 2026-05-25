@@ -20,7 +20,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useCallback, useRef, type KeyboardEvent, type ReactNode } from 'react';
-import type { WorkspaceViewMode } from '../modules/workspace/model';
+import type { WorkspaceViewMode } from '../modules/workspace';
 
 const githubRepositoryUrl = 'https://github.com/danielemasone/enterprise-data-workbench';
 const pagesBasePath = import.meta.env.BASE_URL;
@@ -38,7 +38,8 @@ const viewTabs = [
 const featurePanels = [
   {
     title: 'Dense grid workflows',
-    description: 'Inline edits, keyboard traversal, row selection, sorting, resizing and reordering.',
+    description:
+      'Inline edits, keyboard traversal, row selection, sorting, resizing and reordering.',
     icon: Table2,
   },
   {
@@ -58,7 +59,8 @@ const featurePanels = [
   },
   {
     title: 'Keyboard UX',
-    description: 'Command palette, arrow navigation, edit commit/cancel and sync shortcuts are visible.',
+    description:
+      'Command palette, arrow navigation, edit commit/cancel and sync shortcuts are visible.',
     icon: Keyboard,
   },
 ] as const;
@@ -124,7 +126,11 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
       aria-pressed={theme === 'dark'}
       title={`Switch to ${nextTheme} mode`}
     >
-      {theme === 'light' ? <Moon size={16} aria-hidden="true" /> : <Sun size={16} aria-hidden="true" />}
+      {theme === 'light' ? (
+        <Moon size={16} aria-hidden="true" />
+      ) : (
+        <Sun size={16} aria-hidden="true" />
+      )}
     </button>
   );
 }
@@ -139,7 +145,14 @@ export interface SectionHeaderProps {
 }
 
 /** Standard section heading used by portfolio and workbench panels. */
-export function SectionHeader({ id, eyebrow, icon: Icon, title, description, actions }: SectionHeaderProps) {
+export function SectionHeader({
+                                id,
+                                eyebrow,
+                                icon: Icon,
+                                title,
+                                description,
+                                actions,
+                              }: SectionHeaderProps) {
   return (
     <header className="section-header">
       <div className="section-title-group">
@@ -210,7 +223,12 @@ export function ViewTabs({ activeView, onChange }: ViewTabsProps) {
   };
 
   return (
-    <div className="view-tabs" role="tablist" aria-label="Workbench views" onKeyDown={handleKeyDown}>
+    <div
+      className="view-tabs"
+      role="tablist"
+      aria-label="Workbench views"
+      onKeyDown={handleKeyDown}
+    >
       {viewTabs.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
@@ -241,7 +259,12 @@ export interface HeroSectionProps {
   readonly conflictCount: number;
 }
 
-export function HeroSection({ recordCount, operationCount, pendingCount, conflictCount }: HeroSectionProps) {
+export function HeroSection({
+                              recordCount,
+                              operationCount,
+                              pendingCount,
+                              conflictCount,
+                            }: HeroSectionProps) {
   return (
     <section className="hero-section" aria-labelledby="hero-title">
       <div className="hero-copy">
@@ -302,15 +325,27 @@ export function ArchitectureDiagram() {
         <span className="flow-arrow" aria-hidden="true">
           -&gt;
         </span>
-        <DiagramNode icon={GitBranch} label="Domain commands" detail="Operation factory and immutable mutations" />
+        <DiagramNode
+          icon={GitBranch}
+          label="Domain commands"
+          detail="Operation factory and immutable mutations"
+        />
         <span className="flow-arrow" aria-hidden="true">
           -&gt;
         </span>
-        <DiagramNode icon={Activity} label="Workspace state" detail="Records, conflicts, sync and presence" />
+        <DiagramNode
+          icon={Activity}
+          label="Workspace state"
+          detail="Records, conflicts, sync and presence"
+        />
         <span className="flow-arrow" aria-hidden="true">
           -&gt;
         </span>
-        <DiagramNode icon={RefreshCw} label="Boundaries" detail="IndexedDB, mock sync and reconciliation" />
+        <DiagramNode
+          icon={RefreshCw}
+          label="Boundaries"
+          detail="IndexedDB, mock sync and reconciliation"
+        />
       </div>
     </section>
   );
@@ -365,7 +400,13 @@ export function ResourceLinkGrid() {
   return (
     <nav className="resource-link-grid" aria-label="Project resources">
       {resourceLinks.map(({ label, description, href, icon: Icon }) => (
-        <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={`${label}: ${description}`}>
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`${label}: ${description}`}
+        >
           <Icon size={18} aria-hidden="true" />
           <span>
             <strong>{label}</strong>

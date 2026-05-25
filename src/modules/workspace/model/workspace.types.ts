@@ -1,7 +1,6 @@
 import type { WorkspaceOperation } from './operation.types';
 import type { PresenceUser, SyncStatus, WorkspaceConflict } from './sync.types';
-import type { WorkspacePersistence } from '../services/persistence.service';
-import type { WorkspaceSyncService } from '../services/sync.service';
+import type { WorkspacePersistence, WorkspaceSyncService } from '../services';
 import type {
   CellAddress,
   FieldId,
@@ -10,7 +9,12 @@ import type {
   WorkbenchRecord,
   WorkspaceField,
 } from './record.types';
-import type { EditingCellState, SortState, WorkspaceSelection, WorkspaceViewMode } from './view.types';
+import type {
+  EditingCellState,
+  SortState,
+  WorkspaceSelection,
+  WorkspaceViewMode,
+} from './view.types';
 
 /** Shared document state consumed by table, kanban, and calendar projections. */
 export interface WorkspaceDocument {
@@ -63,7 +67,11 @@ export interface WorkspaceActions {
   readonly setSort: (fieldId: FieldId) => void;
   readonly moveRecordToStatus: (recordId: RecordId, nextStatus: FieldValue) => Promise<void>;
   readonly flushSync: () => Promise<void>;
-  readonly simulateRemoteConflict: (recordId: RecordId, fieldId: FieldId, remoteValue: FieldValue) => void;
+  readonly simulateRemoteConflict: (
+    recordId: RecordId,
+    fieldId: FieldId,
+    remoteValue: FieldValue,
+  ) => void;
   readonly resolveConflict: (conflictId: string, resolution: 'local' | 'remote') => Promise<void>;
   readonly setCommandPaletteOpen: (open: boolean) => void;
 }

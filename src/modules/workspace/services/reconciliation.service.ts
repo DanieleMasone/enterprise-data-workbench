@@ -1,8 +1,11 @@
-import type { WorkspaceOperation } from '../model/operation.types';
-import type { FieldValue } from '../model/record.types';
-import type { SyncResult, WorkspaceConflict } from '../model/sync.types';
-import type { WorkspaceState } from '../model/workspace.types';
-import { applyOperation, markOperations, updateRecordCell } from '../domain/workspaceMutations';
+import type {
+  FieldValue,
+  SyncResult,
+  WorkspaceConflict,
+  WorkspaceOperation,
+  WorkspaceState,
+} from '../model';
+import { applyOperation, markOperations, updateRecordCell } from '../domain';
 
 /** Reconciliation output contains only the state slices affected by sync decisions. */
 export interface ReconciledWorkspace {
@@ -72,16 +75,20 @@ export function resolveWorkspaceConflict(
   const nextRecords =
     resolution === 'remote'
       ? updateRecordCell(
-          state.records,
-          conflict.recordId,
-          conflict.fieldId,
-          conflict.remoteValue,
-          resolvedAt,
-        )
+        state.records,
+        conflict.recordId,
+        conflict.fieldId,
+        conflict.remoteValue,
+        resolvedAt,
+      )
       : state.records;
 
   const nextOperationStatus = resolution === 'remote' ? 'reverted' : 'acknowledged';
-  const operationLog = markOperations(state.operationLog, [conflict.operationId], nextOperationStatus);
+  const operationLog = markOperations(
+    state.operationLog,
+    [conflict.operationId],
+    nextOperationStatus,
+  );
   const conflicts = state.conflicts.map((candidate) =>
     candidate.id === conflictId ? { ...candidate, status: 'resolved' as const } : candidate,
   );

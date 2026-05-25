@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { WorkspaceStoreProvider } from '../modules/workspace/state';
+import { WorkspaceStoreProvider } from '../modules/workspace';
 import { createTestWorkspaceStore } from '../modules/workspace/test/createTestStore';
 import { WorkspaceApplication } from './App';
 
@@ -32,7 +32,9 @@ describe('workspace application shell', () => {
       </WorkspaceStoreProvider>,
     );
 
-    expect(await screen.findByRole('heading', { name: /enterprise data workbench/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /enterprise data workbench/i }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /runtime architecture/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /keyboard shortcuts/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /data-heavy workbench/i })).toBeInTheDocument();

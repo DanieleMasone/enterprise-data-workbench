@@ -1,5 +1,4 @@
-import type { PersistedWorkspace } from '../model/sync.types';
-import type { WorkbenchRecord, WorkspaceField } from '../model/record.types';
+import type { PersistedWorkspace, WorkbenchRecord, WorkspaceField } from '../model';
 
 const fields: readonly WorkspaceField[] = [
   {
@@ -147,7 +146,10 @@ const records: readonly WorkbenchRecord[] = [
 /** Creates a fresh persisted document so tests and hydration do not share references. */
 export function createInitialWorkspace(now = new Date().toISOString()): PersistedWorkspace {
   return {
-    fields: fields.map((field) => ({ ...field, options: field.options ? [...field.options] : undefined })),
+    fields: fields.map((field) => ({
+      ...field,
+      options: field.options ? [...field.options] : undefined,
+    })),
     fieldOrder: fields.map((field) => field.id),
     records: records.map((record) => ({
       ...record,

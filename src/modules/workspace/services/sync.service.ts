@@ -1,6 +1,9 @@
-import type { WorkspaceOperation } from '../model/operation.types';
-import type { WorkspaceConflict, SyncResult } from '../model/sync.types';
-import type { WorkspaceDocument } from '../model/workspace.types';
+import type {
+  WorkspaceConflict,
+  WorkspaceDocument,
+  WorkspaceOperation,
+  SyncResult,
+} from '../model';
 
 /** Synchronization boundary implemented by a mock service for local-first demos. */
 export interface WorkspaceSyncService {
@@ -28,7 +31,8 @@ export class MockWorkspaceSyncService implements WorkspaceSyncService {
     this.#now = options.now ?? (() => new Date().toISOString());
     this.#createId =
       options.createId ??
-      ((prefix) => `${prefix}-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`);
+      ((prefix) =>
+        `${prefix}-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`);
   }
 
   async submitOperations(

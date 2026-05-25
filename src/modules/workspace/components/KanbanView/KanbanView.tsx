@@ -8,9 +8,9 @@ import {
   getCellValue,
   groupRecordsByStatus,
   sortRecords,
-} from '../../domain/workspaceSelectors';
-import type { FieldOption, WorkbenchRecord } from '../../model/record.types';
-import { useWorkspaceSelector } from '../../state/WorkspaceStoreProvider';
+} from '../../domain';
+import type { FieldOption, WorkbenchRecord } from '../../model';
+import { useWorkspaceSelector } from '../../state';
 
 /** Kanban projection of the shared record model with domain-level status movement. */
 export function KanbanView() {

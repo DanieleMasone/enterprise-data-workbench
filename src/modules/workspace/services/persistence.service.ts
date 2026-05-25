@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import type { PersistedWorkspace } from '../model/sync.types';
+import type { PersistedWorkspace } from '../model';
 
 interface PersistedWorkspaceRecord extends PersistedWorkspace {
   readonly id: string;

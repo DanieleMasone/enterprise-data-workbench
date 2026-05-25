@@ -1,12 +1,7 @@
 import { CalendarDays } from 'lucide-react';
 import { useMemo } from 'react';
-import {
-  formatFieldValue,
-  getCellValue,
-  groupRecordsByDate,
-  sortRecords,
-} from '../../domain/workspaceSelectors';
-import { useWorkspaceSelector } from '../../state/WorkspaceStoreProvider';
+import { formatFieldValue, getCellValue, groupRecordsByDate, sortRecords } from '../../domain';
+import { useWorkspaceSelector } from '../../state';
 
 /** Calendar projection that groups the shared records by their due date field. */
 export function CalendarView() {

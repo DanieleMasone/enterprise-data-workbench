@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import type { WorkspaceCommand } from '../../model/view.types';
-import { useWorkspaceSelector } from '../../state/WorkspaceStoreProvider';
+import type { WorkspaceCommand } from '../../model';
+import { useWorkspaceSelector } from '../../state';
 
 /** Keyboard-first command palette for view switching, sync, and demo reconciliation actions. */
 export function CommandPalette() {
@@ -121,7 +121,11 @@ export function CommandPalette() {
   };
 
   return (
-    <div className="command-palette-backdrop" role="presentation" onMouseDown={() => setOpen(false)}>
+    <div
+      className="command-palette-backdrop"
+      role="presentation"
+      onMouseDown={() => setOpen(false)}
+    >
       <section
         id="workspace-command-palette"
         className="command-palette"

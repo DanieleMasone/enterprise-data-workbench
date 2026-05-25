@@ -9,10 +9,10 @@ export interface KeyboardShortcutOptions {
 
 /** Registers global workspace shortcuts while leaving focused editors in control of text input. */
 export function useKeyboardShortcuts({
-  enabled = true,
-  onCommandPalette,
-  onSync,
-}: KeyboardShortcutOptions): void {
+                                       enabled = true,
+                                       onCommandPalette,
+                                       onSync,
+                                     }: KeyboardShortcutOptions): void {
   useEffect(() => {
     if (!enabled) {
       return undefined;

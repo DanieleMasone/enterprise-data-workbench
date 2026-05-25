@@ -48,8 +48,7 @@ describe('workspace hooks', () => {
   it('tracks optimistic mutation success and failure state', async () => {
     const successMutation = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
     const { result, rerender } = renderHook(
-      ({ mutation }: { readonly mutation: () => Promise<void> }) =>
-        useOptimisticMutation(mutation),
+      ({ mutation }: { readonly mutation: () => Promise<void> }) => useOptimisticMutation(mutation),
       {
         initialProps: {
           mutation: successMutation,

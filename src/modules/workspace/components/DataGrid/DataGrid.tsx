@@ -8,11 +8,7 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import { useEffect, useMemo, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import {
-  getCoreRowModel,
-  useReactTable,
-  type ColumnDef,
-} from '@tanstack/react-table';
+import { getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table';
 import {
   findField,
   formatFieldValue,
@@ -21,9 +17,9 @@ import {
   getOrderedFields,
   getPendingOperationsForCell,
   sortRecords,
-} from '../../domain/workspaceSelectors';
-import type { FieldValue, WorkbenchRecord, WorkspaceField } from '../../model/record.types';
-import { useWorkspaceSelector } from '../../state/WorkspaceStoreProvider';
+} from '../../domain';
+import type { FieldValue, WorkbenchRecord, WorkspaceField } from '../../model';
+import { useWorkspaceSelector } from '../../state';
 
 /** Dense table grid with inline editing, layout controls, selection, sorting, and keyboard navigation. */
 export function DataGrid() {
@@ -131,7 +127,10 @@ export function DataGrid() {
     }
   };
 
-  const beginColumnResize = (event: PointerEvent<HTMLButtonElement>, field: WorkspaceField): void => {
+  const beginColumnResize = (
+    event: PointerEvent<HTMLButtonElement>,
+    field: WorkspaceField,
+  ): void => {
     event.preventDefault();
     const startX = event.clientX;
     const startWidth = draftWidths[field.id] ?? field.width;
@@ -180,143 +179,146 @@ export function DataGrid() {
       <div className="data-grid-shell" onKeyDown={handleGridKeyDown}>
         <table className="data-grid" role="grid" aria-rowcount={sortedRecords.length}>
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                <th className="row-selector-header" scope="col" aria-label="Row selection" />
-                {headerGroup.headers.map((header) => {
-                  const field = findField(orderedFields, header.column.id);
-                  if (!field) {
-                    return null;
-                  }
-                  const width = draftWidths[field.id] ?? field.width;
-                  const isSorted = sort?.fieldId === field.id;
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              <th className="row-selector-header" scope="col" aria-label="Row selection" />
+              {headerGroup.headers.map((header) => {
+                const field = findField(orderedFields, header.column.id);
+                if (!field) {
+                  return null;
+                }
+                const width = draftWidths[field.id] ?? field.width;
+                const isSorted = sort?.fieldId === field.id;
 
-                  return (
-                    <th key={field.id} scope="col" style={{ width, minWidth: field.minWidth }}>
-                      <div className="column-header">
+                return (
+                  <th key={field.id} scope="col" style={{ width, minWidth: field.minWidth }}>
+                    <div className="column-header">
+                      <button
+                        type="button"
+                        className="column-title"
+                        onClick={() => setSort(field.id)}
+                        aria-label={`Sort by ${field.label}`}
+                        title={`Sort by ${field.label}`}
+                      >
+                        <span>{field.label}</span>
+                        {isSorted && sort.direction === 'asc' ? (
+                          <ArrowDownAZ size={15} aria-hidden="true" />
+                        ) : (
+                          <ArrowUpZA size={15} aria-hidden="true" />
+                        )}
+                      </button>
+                      <div
+                        className="column-actions"
+                        aria-label={`${field.label} column controls`}
+                      >
                         <button
                           type="button"
-                          className="column-title"
-                          onClick={() => setSort(field.id)}
-                          aria-label={`Sort by ${field.label}`}
-                          title={`Sort by ${field.label}`}
+                          className="icon-button"
+                          onClick={() => moveColumnLeft(field)}
+                          aria-label={`Move ${field.label} left`}
+                          title={`Move ${field.label} left`}
                         >
-                          <span>{field.label}</span>
-                          {isSorted && sort.direction === 'asc' ? (
-                            <ArrowDownAZ size={15} aria-hidden="true" />
-                          ) : (
-                            <ArrowUpZA size={15} aria-hidden="true" />
-                          )}
+                          <ChevronLeft size={15} aria-hidden="true" />
                         </button>
-                        <div className="column-actions" aria-label={`${field.label} column controls`}>
-                          <button
-                            type="button"
-                            className="icon-button"
-                            onClick={() => moveColumnLeft(field)}
-                            aria-label={`Move ${field.label} left`}
-                            title={`Move ${field.label} left`}
-                          >
-                            <ChevronLeft size={15} aria-hidden="true" />
-                          </button>
-                          <button
-                            type="button"
-                            className="icon-button"
-                            onClick={() => moveColumnRight(field)}
-                            aria-label={`Move ${field.label} right`}
-                            title={`Move ${field.label} right`}
-                          >
-                            <ChevronRight size={15} aria-hidden="true" />
-                          </button>
-                          <button
-                            type="button"
-                            className="resize-handle"
-                            onPointerDown={(event) => beginColumnResize(event, field)}
-                            aria-label={`Resize ${field.label}`}
-                            title={`Resize ${field.label}`}
-                          >
-                            <GripVertical size={14} aria-hidden="true" />
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          className="icon-button"
+                          onClick={() => moveColumnRight(field)}
+                          aria-label={`Move ${field.label} right`}
+                          title={`Move ${field.label} right`}
+                        >
+                          <ChevronRight size={15} aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          className="resize-handle"
+                          onPointerDown={(event) => beginColumnResize(event, field)}
+                          aria-label={`Resize ${field.label}`}
+                          title={`Resize ${field.label}`}
+                        >
+                          <GripVertical size={14} aria-hidden="true" />
+                        </button>
                       </div>
-                    </th>
+                    </div>
+                  </th>
+                );
+              })}
+            </tr>
+          ))}
+          </thead>
+          <tbody>
+          {table.getRowModel().rows.map((row) => {
+            const record = row.original;
+            const isSelectedRecord = selection.selectedRecordIds.includes(record.id);
+
+            return (
+              <tr key={record.id} aria-selected={isSelectedRecord}>
+                <td className="row-selector-cell">
+                  <input
+                    type="checkbox"
+                    aria-label={`Select ${formatFieldValue(getCellValue(record, 'title'))}`}
+                    checked={isSelectedRecord}
+                    onChange={() => toggleRecordSelection(record.id)}
+                  />
+                </td>
+                {orderedFields.map((field) => {
+                  const cell = { recordId: record.id, fieldId: field.id };
+                  const value = getCellValue(record, field.id);
+                  const selected =
+                    selection.selectedCell.recordId === record.id &&
+                    selection.selectedCell.fieldId === field.id;
+                  const editing =
+                    editingCell?.recordId === record.id && editingCell.fieldId === field.id;
+                  const openConflicts = getOpenConflictsForCell(conflicts, cell);
+                  const pendingOperations = getPendingOperationsForCell(operationLog, cell);
+
+                  return (
+                    <td
+                      key={field.id}
+                      role="gridcell"
+                      tabIndex={selected && !editing ? 0 : -1}
+                      aria-selected={selected}
+                      data-cell-id={`${record.id}:${field.id}`}
+                      data-testid={`grid-cell-${record.id}-${field.id}`}
+                      className={[
+                        selected ? 'is-selected' : '',
+                        openConflicts.length > 0 ? 'has-conflict' : '',
+                        pendingOperations.length > 0 ? 'has-pending' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      onFocus={() => selectCell(cell)}
+                      onClick={() => selectCell(cell)}
+                      onDoubleClick={() => startEditing(cell)}
+                    >
+                      {editing ? (
+                        <InlineEditor
+                          value={editingCell.draftValue}
+                          onChange={updateEditingDraft}
+                          onCommit={() => {
+                            void commitEditing();
+                          }}
+                          onCancel={cancelEditing}
+                        />
+                      ) : (
+                        <CellDisplay field={field} value={value} />
+                      )}
+                      {pendingOperations.length > 0 ? (
+                        <span className="cell-state-dot" aria-label="Pending operation" />
+                      ) : null}
+                      {openConflicts.length > 0 ? (
+                        <TriangleAlert
+                          className="cell-conflict-icon"
+                          size={15}
+                          aria-label="Conflict"
+                        />
+                      ) : null}
+                    </td>
                   );
                 })}
               </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => {
-              const record = row.original;
-              const isSelectedRecord = selection.selectedRecordIds.includes(record.id);
-
-              return (
-                <tr key={record.id} aria-selected={isSelectedRecord}>
-                  <td className="row-selector-cell">
-                    <input
-                      type="checkbox"
-                      aria-label={`Select ${formatFieldValue(getCellValue(record, 'title'))}`}
-                      checked={isSelectedRecord}
-                      onChange={() => toggleRecordSelection(record.id)}
-                    />
-                  </td>
-                  {orderedFields.map((field) => {
-                    const cell = { recordId: record.id, fieldId: field.id };
-                    const value = getCellValue(record, field.id);
-                    const selected =
-                      selection.selectedCell.recordId === record.id &&
-                      selection.selectedCell.fieldId === field.id;
-                    const editing =
-                      editingCell?.recordId === record.id && editingCell.fieldId === field.id;
-                    const openConflicts = getOpenConflictsForCell(conflicts, cell);
-                    const pendingOperations = getPendingOperationsForCell(operationLog, cell);
-
-                    return (
-                      <td
-                        key={field.id}
-                        role="gridcell"
-                        tabIndex={selected && !editing ? 0 : -1}
-                        aria-selected={selected}
-                        data-cell-id={`${record.id}:${field.id}`}
-                        data-testid={`grid-cell-${record.id}-${field.id}`}
-                        className={[
-                          selected ? 'is-selected' : '',
-                          openConflicts.length > 0 ? 'has-conflict' : '',
-                          pendingOperations.length > 0 ? 'has-pending' : '',
-                        ]
-                          .filter(Boolean)
-                          .join(' ')}
-                        onFocus={() => selectCell(cell)}
-                        onClick={() => selectCell(cell)}
-                        onDoubleClick={() => startEditing(cell)}
-                      >
-                        {editing ? (
-                          <InlineEditor
-                            value={editingCell.draftValue}
-                            onChange={updateEditingDraft}
-                            onCommit={() => {
-                              void commitEditing();
-                            }}
-                            onCancel={cancelEditing}
-                          />
-                        ) : (
-                          <CellDisplay field={field} value={value} />
-                        )}
-                        {pendingOperations.length > 0 ? (
-                          <span className="cell-state-dot" aria-label="Pending operation" />
-                        ) : null}
-                        {openConflicts.length > 0 ? (
-                          <TriangleAlert
-                            className="cell-conflict-icon"
-                            size={15}
-                            aria-label="Conflict"
-                          />
-                        ) : null}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
+            );
+          })}
           </tbody>
         </table>
       </div>

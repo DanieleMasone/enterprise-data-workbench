@@ -1,20 +1,22 @@
-import type { WorkspaceOperation } from '../model/operation.types';
 import type {
   CellAddress,
   FieldId,
   FieldValue,
   RecordId,
+  SortState,
+  WorkspaceConflict,
+  WorkspaceDocument,
+  WorkspaceOperation,
   WorkbenchRecord,
   WorkspaceField,
-} from '../model/record.types';
-import type { WorkspaceConflict } from '../model/sync.types';
-import type { SortState } from '../model/view.types';
-import type { WorkspaceDocument } from '../model/workspace.types';
+} from '../model';
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 /** Returns fields in user-controlled order while keeping field metadata immutable. */
-export function getOrderedFields(document: Pick<WorkspaceDocument, 'fields' | 'fieldOrder'>): WorkspaceField[] {
+export function getOrderedFields(
+  document: Pick<WorkspaceDocument, 'fields' | 'fieldOrder'>,
+): WorkspaceField[] {
   const fieldById = new Map(document.fields.map((field) => [field.id, field]));
   return document.fieldOrder.flatMap((fieldId) => {
     const field = fieldById.get(fieldId);
@@ -48,7 +50,10 @@ export function formatFieldValue(value: FieldValue): string {
 }
 
 /** Applies workspace sort without mutating the source record collection. */
-export function sortRecords(records: readonly WorkbenchRecord[], sort: SortState | null): WorkbenchRecord[] {
+export function sortRecords(
+  records: readonly WorkbenchRecord[],
+  sort: SortState | null,
+): WorkbenchRecord[] {
   if (!sort) {
     return [...records];
   }
@@ -81,12 +86,18 @@ export function getNextCellAddress(
 }
 
 /** Locates the record backing a cell selection or operation. */
-export function findRecord(records: readonly WorkbenchRecord[], recordId: RecordId): WorkbenchRecord | null {
+export function findRecord(
+  records: readonly WorkbenchRecord[],
+  recordId: RecordId,
+): WorkbenchRecord | null {
   return records.find((record) => record.id === recordId) ?? null;
 }
 
 /** Locates field metadata for parsing, sorting, and rendering controls. */
-export function findField(fields: readonly WorkspaceField[], fieldId: FieldId): WorkspaceField | null {
+export function findField(
+  fields: readonly WorkspaceField[],
+  fieldId: FieldId,
+): WorkspaceField | null {
   return fields.find((field) => field.id === fieldId) ?? null;
 }
 

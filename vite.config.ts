@@ -33,12 +33,7 @@ export default defineConfig({
         lines: 75,
         statements: 75,
       },
-      exclude: [
-        'src/main.tsx',
-        'src/**/*.test.*',
-        'src/**/*.d.ts',
-        'src/vite-env.d.ts',
-      ],
+      exclude: ['src/main.tsx', 'src/**/*.test.*', 'src/**/*.d.ts', 'src/vite-env.d.ts'],
     },
   },
 });

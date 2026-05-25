@@ -1,9 +1,12 @@
-import type { PersistedWorkspace, SyncResult } from '../model/sync.types';
-import type { WorkspaceOperation } from '../model/operation.types';
-import type { WorkspaceDocument, WorkspaceDependencies } from '../model/workspace.types';
-import type { WorkspacePersistence } from '../services/persistence.service';
-import type { WorkspaceSyncService } from '../services/sync.service';
-import { createWorkspaceStore, type WorkspaceStoreHook } from '../state/workspace.store';
+import type {
+  WorkspaceOperation,
+  WorkspaceDocument,
+  WorkspaceDependencies,
+  PersistedWorkspace,
+  SyncResult,
+} from '../model';
+import type { WorkspacePersistence, WorkspaceSyncService } from '../services';
+import { createWorkspaceStore, type WorkspaceStoreHook } from '../state';
 
 /** In-memory persistence test double that records every saved snapshot. */
 export class InMemoryWorkspacePersistence implements WorkspacePersistence {
@@ -54,9 +57,7 @@ export class TestWorkspaceSyncService implements WorkspaceSyncService {
 }
 
 /** Creates a store with deterministic IDs, clocks, persistence, and sync. */
-export function createTestWorkspaceStore(
-  snapshot: PersistedWorkspace | null = null,
-): {
+export function createTestWorkspaceStore(snapshot: PersistedWorkspace | null = null): {
   readonly store: WorkspaceStoreHook;
   readonly persistence: InMemoryWorkspacePersistence;
   readonly syncService: TestWorkspaceSyncService;

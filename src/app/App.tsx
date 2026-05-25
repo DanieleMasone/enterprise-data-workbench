@@ -8,9 +8,9 @@ import {
   PresenceLayer,
   SyncInspector,
 } from '../modules/workspace/components';
-import { useKeyboardShortcuts } from '../modules/workspace/hooks';
-import { WorkspaceStoreProvider, useWorkspaceSelector } from '../modules/workspace/state';
-import type { WorkspaceViewMode } from '../modules/workspace/model';
+import { useKeyboardShortcuts } from '../modules/workspace';
+import { WorkspaceStoreProvider, useWorkspaceSelector } from '../modules/workspace';
+import type { WorkspaceViewMode } from '../modules/workspace';
 import {
   ArchitectureDiagram,
   CapabilityGrid,
@@ -52,7 +52,10 @@ export function WorkspaceApplication() {
   const operationCount = useWorkspaceSelector((store) => store.operationLog.length);
   const recordCount = useWorkspaceSelector((store) => store.records.length);
   const [theme, setTheme] = usePersistedTheme();
-  const openCommandPalette = useCallback(() => setCommandPaletteOpen(true), [setCommandPaletteOpen]);
+  const openCommandPalette = useCallback(
+    () => setCommandPaletteOpen(true),
+    [setCommandPaletteOpen],
+  );
   const syncNow = useCallback(() => {
     void flushSync();
   }, [flushSync]);

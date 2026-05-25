@@ -1,8 +1,8 @@
 import { Check, RefreshCw, RotateCcw, ServerCog, TriangleAlert } from 'lucide-react';
 import { useCallback } from 'react';
-import { formatFieldValue } from '../../domain/workspaceSelectors';
-import { useOptimisticMutation } from '../../hooks/useOptimisticMutation';
-import { useWorkspaceSelector } from '../../state/WorkspaceStoreProvider';
+import { formatFieldValue } from '../../domain';
+import { useOptimisticMutation } from '../../hooks';
+import { useWorkspaceSelector } from '../../state';
 
 /** Inspector for explicit sync state, pending operations, and conflict resolution. */
 export function SyncInspector() {

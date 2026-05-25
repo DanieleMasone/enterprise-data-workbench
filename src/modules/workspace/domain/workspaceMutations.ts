@@ -1,9 +1,17 @@
-import type { WorkspaceOperation } from '../model/operation.types';
-import type { FieldId, FieldValue, WorkbenchRecord, WorkspaceField } from '../model/record.types';
-import type { WorkspaceDocument } from '../model/workspace.types';
+import type {
+  FieldId,
+  FieldValue,
+  WorkspaceDocument,
+  WorkspaceOperation,
+  WorkbenchRecord,
+  WorkspaceField,
+} from '../model';
 
 /** Applies a serializable operation to a workspace document without mutating inputs. */
-export function applyOperation(document: WorkspaceDocument, operation: WorkspaceOperation): WorkspaceDocument {
+export function applyOperation(
+  document: WorkspaceDocument,
+  operation: WorkspaceOperation,
+): WorkspaceDocument {
   switch (operation.type) {
     case 'cell.update':
       return {
@@ -89,17 +97,17 @@ export function reorderFields(
   fieldId: FieldId,
   targetFieldId: FieldId,
 ): FieldId[] {
-  if (fieldId === targetFieldId || !fieldOrder.includes(fieldId) || !fieldOrder.includes(targetFieldId)) {
+  if (
+    fieldId === targetFieldId ||
+    !fieldOrder.includes(fieldId) ||
+    !fieldOrder.includes(targetFieldId)
+  ) {
     return [...fieldOrder];
   }
 
   const withoutSource = fieldOrder.filter((id) => id !== fieldId);
   const targetIndex = withoutSource.indexOf(targetFieldId);
-  return [
-    ...withoutSource.slice(0, targetIndex),
-    fieldId,
-    ...withoutSource.slice(targetIndex),
-  ];
+  return [...withoutSource.slice(0, targetIndex), fieldId, ...withoutSource.slice(targetIndex)];
 }
 
 /** Replaces an operation status while keeping the log append-only and inspectable. */
@@ -109,5 +117,7 @@ export function markOperations(
   status: WorkspaceOperation['status'],
 ): WorkspaceOperation[] {
   const ids = new Set(operationIds);
-  return operations.map((operation) => (ids.has(operation.id) ? { ...operation, status } : operation));
+  return operations.map((operation) =>
+    ids.has(operation.id) ? { ...operation, status } : operation,
+  );
 }

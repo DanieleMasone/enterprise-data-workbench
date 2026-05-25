@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useContext } from 'react';
 import { useStore } from 'zustand';
-import type { WorkspaceStore } from '../model/workspace.types';
+import type { WorkspaceStore } from '../model';
 import { useWorkspaceStore, type WorkspaceStoreHook } from './workspace.store';
 
 const WorkspaceStoreContext = createContext<WorkspaceStoreHook | null>(null);
@@ -12,7 +12,10 @@ export interface WorkspaceStoreProviderProps {
 }
 
 /** Provides an injectable workspace store so UI tests can use isolated state. */
-export function WorkspaceStoreProvider({ children, store = useWorkspaceStore }: WorkspaceStoreProviderProps) {
+export function WorkspaceStoreProvider({
+                                         children,
+                                         store = useWorkspaceStore,
+                                       }: WorkspaceStoreProviderProps) {
   return <WorkspaceStoreContext.Provider value={store}>{children}</WorkspaceStoreContext.Provider>;
 }
 

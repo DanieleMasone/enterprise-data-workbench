@@ -2,10 +2,13 @@ import type {
   CellUpdateOperation,
   ColumnReorderOperation,
   ColumnResizeOperation,
+  FieldId,
+  FieldValue,
   OperationEnvelope,
   RecordStatusMoveOperation,
-} from '../model/operation.types';
-import type { FieldId, FieldValue, WorkbenchRecord, WorkspaceField } from '../model/record.types';
+  WorkbenchRecord,
+  WorkspaceField,
+} from '../model';
 import { getCellValue } from './workspaceSelectors';
 import { reorderFields } from './workspaceMutations';
 
