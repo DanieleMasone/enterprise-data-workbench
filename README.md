@@ -1,5 +1,10 @@
 # Enterprise Data Workbench
 
+[![CI](https://github.com/danielemasone/enterprise-data-workbench/actions/workflows/ci.yml/badge.svg)](https://github.com/danielemasone/enterprise-data-workbench/actions/workflows/ci.yml)
+[![GitHub Pages](https://img.shields.io/badge/github--pages-live-success)](https://danielemasone.github.io/enterprise-data-workbench/)
+[![Coverage](https://img.shields.io/badge/coverage-available-informational)](https://danielemasone.github.io/enterprise-data-workbench/coverage/)
+[![API Docs](https://img.shields.io/badge/api-docs-blueviolet)](https://danielemasone.github.io/enterprise-data-workbench/docs/)
+
 Enterprise Data Workbench is a portfolio-grade React, TypeScript and Vite application for dense, local-first enterprise data workflows. It showcases a domain-first frontend architecture where table, kanban and calendar views share one workspace document, every mutation is logged as an operation, and sync/reconciliation behavior is visible in the UI.
 
 - **Live demo:** [danielemasone.github.io/enterprise-data-workbench](https://danielemasone.github.io/enterprise-data-workbench/)
