@@ -34,6 +34,12 @@ test('loads the portfolio shell and exposes stable project links', async ({ page
     'href',
     'https://github.com/danielemasone/enterprise-data-workbench',
   );
+  await expect(
+    page.getByRole('link', { name: 'User guide: Practical app walkthrough' }),
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/danielemasone/enterprise-data-workbench/blob/main/guides/user-guide.md',
+  );
   await expect(page.getByRole('link', { name: 'TypeDoc: Generated API docs' })).toHaveAttribute(
     'href',
     `${appPath}docs/`,
@@ -43,11 +49,13 @@ test('loads the portfolio shell and exposes stable project links', async ({ page
     `${appPath}coverage/`,
   );
 
-  const inertLinks = await page.locator('a').evaluateAll((links) =>
-    links
-      .map((link) => link.getAttribute('href') ?? '')
-      .filter((href) => href.length === 0 || href === '#'),
-  );
+  const inertLinks = await page
+    .locator('a')
+    .evaluateAll((links) =>
+      links
+        .map((link) => link.getAttribute('href') ?? '')
+        .filter((href) => href.length === 0 || href === '#'),
+    );
   expect(inertLinks).toEqual([]);
   expect(criticalErrors).toEqual([]);
 });
@@ -94,7 +102,10 @@ test('switches Table, Kanban and Calendar as accessible workbench tabs', async (
 test('supports table editing, selection, sorting and sync inspection on desktop', async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name === 'chromium-mobile', 'Dense table edit flow is covered on desktop.');
+  test.skip(
+    testInfo.project.name === 'chromium-mobile',
+    'Dense table edit flow is covered on desktop.',
+  );
   await openWorkbench(page);
 
   await page.getByRole('checkbox', { name: 'Select Revenue cockpit dashboard' }).check();
@@ -113,7 +124,9 @@ test('supports table editing, selection, sorting and sync inspection on desktop'
   await expect(page.getByRole('button', { name: 'Sort by Estimate' })).toBeVisible();
 });
 
-test('opens the command palette from the keyboard and executes a view command', async ({ page }) => {
+test('opens the command palette from the keyboard and executes a view command', async ({
+  page,
+}) => {
   await openWorkbench(page);
 
   await page.keyboard.press('Control+K');
@@ -136,7 +149,10 @@ test('opens the command palette from the keyboard and executes a view command', 
 test('syncs a pending edit, simulates a conflict and resolves it on desktop', async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name === 'chromium-mobile', 'Conflict resolution detail is covered on desktop.');
+  test.skip(
+    testInfo.project.name === 'chromium-mobile',
+    'Conflict resolution detail is covered on desktop.',
+  );
   await openWorkbench(page);
 
   await page.getByRole('gridcell', { name: 'Maya' }).dblclick();
@@ -158,7 +174,10 @@ test('syncs a pending edit, simulates a conflict and resolves it on desktop', as
 test('keeps the mobile shell usable without page-level horizontal overflow', async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name !== 'chromium-mobile', 'Mobile layout is covered by the mobile project.');
+  test.skip(
+    testInfo.project.name !== 'chromium-mobile',
+    'Mobile layout is covered by the mobile project.',
+  );
   await openWorkbench(page);
 
   const hasHorizontalOverflow = await page.evaluate(
@@ -170,7 +189,10 @@ test('keeps the mobile shell usable without page-level horizontal overflow', asy
   await page.getByRole('tab', { name: 'Kanban' }).click();
   await expect(page.getByRole('tab', { name: 'Kanban' })).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('tab', { name: 'Calendar' }).click();
-  await expect(page.getByRole('tab', { name: 'Calendar' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: 'Calendar' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
 
   await page.getByRole('button', { name: /Switch to (dark|light) mode/ }).click();
   await expect(page.locator('.app-shell')).toHaveAttribute('data-theme', /dark|light/);

@@ -66,7 +66,10 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 
 ## Documentation Expectations
 
-- Keep README.md aligned with the implemented product, not a wishlist.
+- Treat README.md as the concise portfolio landing page, not the full product manual.
+- Keep committed long-form user, architecture and testing documentation under `guides/`.
+- Reserve ignored `docs/` for generated TypeDoc output; never mix source guides into that directory.
+- Keep README, guides, TypeDoc URLs and in-app resource links consistent without duplicating large sections.
 - Keep the README Mermaid diagram and the in-app architecture diagram aligned with the actual code paths.
 - Keep live demo, TypeDoc and coverage links stable when deployment paths change.
 - Keep TypeDoc warning-free.

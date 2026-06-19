@@ -1,5 +1,6 @@
 import {
   Activity,
+  BookMarked,
   BookOpen,
   CalendarDays,
   CheckCircle2,
@@ -23,6 +24,7 @@ import { useCallback, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import type { WorkspaceViewMode } from '../modules/workspace';
 
 const githubRepositoryUrl = 'https://github.com/danielemasone/enterprise-data-workbench';
+const githubUserGuideUrl = `${githubRepositoryUrl}/blob/main/guides/user-guide.md`;
 const pagesBasePath = import.meta.env.BASE_URL;
 
 const viewTabs = [
@@ -74,9 +76,15 @@ const resourceLinks = [
   },
   {
     label: 'README',
-    description: 'Architecture and setup',
+    description: 'Portfolio overview',
     href: `${githubRepositoryUrl}#readme`,
     icon: BookOpen,
+  },
+  {
+    label: 'User guide',
+    description: 'Practical app walkthrough',
+    href: githubUserGuideUrl,
+    icon: BookMarked,
   },
   {
     label: 'TypeDoc',
@@ -146,13 +154,13 @@ export interface SectionHeaderProps {
 
 /** Standard section heading used by portfolio and workbench panels. */
 export function SectionHeader({
-                                id,
-                                eyebrow,
-                                icon: Icon,
-                                title,
-                                description,
-                                actions,
-                              }: SectionHeaderProps) {
+  id,
+  eyebrow,
+  icon: Icon,
+  title,
+  description,
+  actions,
+}: SectionHeaderProps) {
   return (
     <header className="section-header">
       <div className="section-title-group">
@@ -260,11 +268,11 @@ export interface HeroSectionProps {
 }
 
 export function HeroSection({
-                              recordCount,
-                              operationCount,
-                              pendingCount,
-                              conflictCount,
-                            }: HeroSectionProps) {
+  recordCount,
+  operationCount,
+  pendingCount,
+  conflictCount,
+}: HeroSectionProps) {
   return (
     <section className="hero-section" aria-labelledby="hero-title">
       <div className="hero-copy">

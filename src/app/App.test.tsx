@@ -42,6 +42,12 @@ describe('workspace application shell', () => {
       'href',
       'https://github.com/danielemasone/enterprise-data-workbench',
     );
+    expect(
+      screen.getByRole('link', { name: /user guide: practical app walkthrough/i }),
+    ).toHaveAttribute(
+      'href',
+      'https://github.com/danielemasone/enterprise-data-workbench/blob/main/guides/user-guide.md',
+    );
     expect(screen.getByRole('link', { name: /typedoc: generated api docs/i })).toHaveAttribute(
       'href',
       '/docs/',
