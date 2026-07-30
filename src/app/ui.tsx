@@ -1,5 +1,6 @@
 import {
   Activity,
+  ArrowRight,
   BookMarked,
   BookOpen,
   CalendarDays,
@@ -24,7 +25,6 @@ import { useCallback, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import type { WorkspaceViewMode } from '../modules/workspace';
 
 const githubRepositoryUrl = 'https://github.com/danielemasone/enterprise-data-workbench';
-const githubUserGuideUrl = `${githubRepositoryUrl}/blob/main/guides/user-guide.md`;
 const pagesBasePath = import.meta.env.BASE_URL;
 
 const viewTabs = [
@@ -73,30 +73,35 @@ const resourceLinks = [
     description: 'Source repository',
     href: githubRepositoryUrl,
     icon: GitBranch,
+    external: true,
   },
   {
     label: 'README',
     description: 'Portfolio overview',
     href: `${githubRepositoryUrl}#readme`,
     icon: BookOpen,
+    external: true,
   },
   {
     label: 'User guide',
     description: 'Practical app walkthrough',
-    href: githubUserGuideUrl,
+    href: `${pagesBasePath}guide/`,
     icon: BookMarked,
+    external: false,
   },
   {
     label: 'TypeDoc',
     description: 'Generated API docs',
     href: `${pagesBasePath}docs/`,
     icon: FileText,
+    external: false,
   },
   {
     label: 'Coverage',
     description: 'Generated test report',
     href: `${pagesBasePath}coverage/`,
     icon: Activity,
+    external: false,
   },
 ] as const;
 
@@ -119,6 +124,32 @@ const qualityGates = [
 export interface ThemeToggleProps {
   readonly theme: 'light' | 'dark';
   readonly onToggle: () => void;
+}
+
+export interface SiteHeaderProps {
+  readonly title?: string;
+  readonly subtitle: string;
+  readonly actions: ReactNode;
+}
+
+/** Shared product header used by the workbench and published user guide. */
+export function SiteHeader({
+  title = 'Enterprise Data Workbench',
+  subtitle,
+  actions,
+}: SiteHeaderProps) {
+  return (
+    <header className="app-header">
+      <div className="brand-block">
+        <Columns3 size={22} aria-hidden="true" />
+        <div>
+          <h1>{title}</h1>
+          <p>{subtitle}</p>
+        </div>
+      </div>
+      <div className="header-actions">{actions}</div>
+    </header>
+  );
 }
 
 /** Accessible dark/light mode control shared by the app header. */
@@ -319,15 +350,20 @@ export function CapabilityGrid() {
   );
 }
 
-export function ArchitectureDiagram() {
+export interface ArchitectureDiagramProps {
+  readonly id?: string;
+  readonly title?: string;
+  readonly description?: string;
+}
+
+export function ArchitectureDiagram({
+  id = 'architecture-title',
+  title = 'Runtime architecture',
+  description = 'Views derive from one document and mutations cross explicit boundaries.',
+}: ArchitectureDiagramProps = {}) {
   return (
-    <section className="architecture-panel" aria-labelledby="architecture-title">
-      <SectionHeader
-        id="architecture-title"
-        icon={Network}
-        title="Runtime architecture"
-        description="Views derive from one document and mutations cross explicit boundaries."
-      />
+    <section className="architecture-panel" aria-labelledby={id}>
+      <SectionHeader id={id} icon={Network} title={title} description={description} />
       <div className="architecture-flow" aria-label="Architecture flow">
         <DiagramNode icon={Layers3} label="UI views" detail="Grid, kanban, calendar, palette" />
         <span className="flow-arrow" aria-hidden="true">
@@ -407,22 +443,26 @@ export function QualityGateGrid() {
 export function ResourceLinkGrid() {
   return (
     <nav className="resource-link-grid" aria-label="Project resources">
-      {resourceLinks.map(({ label, description, href, icon: Icon }) => (
-        <a
-          key={label}
-          href={href}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={`${label}: ${description}`}
-        >
-          <Icon size={18} aria-hidden="true" />
-          <span>
-            <strong>{label}</strong>
-            <small>{description}</small>
-          </span>
-          <ExternalLink size={15} aria-hidden="true" />
-        </a>
-      ))}
+      {resourceLinks.map(({ label, description, href, icon: Icon, external }) => {
+        const LinkIcon = external ? ExternalLink : ArrowRight;
+
+        return (
+          <a
+            key={label}
+            href={href}
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noreferrer' : undefined}
+            aria-label={`${label}: ${description}`}
+          >
+            <Icon size={18} aria-hidden="true" />
+            <span>
+              <strong>{label}</strong>
+              <small>{description}</small>
+            </span>
+            <LinkIcon size={15} aria-hidden="true" />
+          </a>
+        );
+      })}
     </nav>
   );
 }

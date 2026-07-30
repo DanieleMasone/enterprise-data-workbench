@@ -76,7 +76,7 @@ Playwright writes ignored `playwright-report/` and `test-results/` directories. 
 
 `npm run docs` generates the exported workspace API from `src/modules/workspace/index.ts` into ignored `docs/`. TypeDoc treats warnings as errors.
 
-`docs/` is generated output. Committed user and engineering documentation belongs in `guides/` so source guides cannot collide with the published TypeDoc route.
+`docs/` is generated output. The primary end-user documentation is the React experience in `src/app/guide/`; committed Markdown in `guides/` is reserved for maintainer architecture and delivery detail.
 
 The latest generated reference is published at [GitHub Pages TypeDoc](https://danielemasone.github.io/enterprise-data-workbench/docs/).
 
@@ -121,7 +121,7 @@ Pull requests run:
 2. Chromium installation through Playwright.
 3. Type checking and zero-warning linting.
 4. Vitest coverage.
-5. The Vite production build.
+5. The Vite production build, including the `/guide/` entry.
 6. TypeDoc generation.
 7. Playwright against the already-built Vite preview.
 
@@ -143,6 +143,7 @@ Concurrency cancels an older run for the same workflow/ref so stale Pages builds
 ```text
 dist/
   index.html            Vite application
+  guide/index.html      Published React User Guide entry
   assets/               production JS/CSS
   docs/                 generated TypeDoc
   coverage/             generated coverage HTML
@@ -153,6 +154,7 @@ The app and both reports are one Pages artifact. No generated `dist/`, `docs/` o
 Stable published URLs:
 
 - [Application](https://danielemasone.github.io/enterprise-data-workbench/)
+- [User Guide](https://danielemasone.github.io/enterprise-data-workbench/guide/)
 - [TypeDoc](https://danielemasone.github.io/enterprise-data-workbench/docs/)
 - [Coverage](https://danielemasone.github.io/enterprise-data-workbench/coverage/)
 

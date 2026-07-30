@@ -43,7 +43,7 @@ jobs:
       - name: Test with coverage
         run: npm run test:coverage
 
-      - name: Build
+      - name: Build app and user guide
         run: npm run build
         env:
           VITE_BASE_PATH: /enterprise-data-workbench/

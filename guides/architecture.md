@@ -61,7 +61,8 @@ The compact diagram in the README and the in-app diagram describe the same path 
 | `src/modules/workspace/services/`   | Persistence, mock sync and reconciliation boundaries        |
 | `src/modules/workspace/components/` | Table, kanban, calendar, palette, presence and inspector UI |
 | `src/modules/workspace/hooks/`      | Keyboard and optimistic async orchestration                 |
-| `src/app/`                          | Portfolio shell, theme and shared showcase UI               |
+| `src/app/`                          | Portfolio shell, shared theme/UI and published User Guide   |
+| `src/app/guide/`                    | End-user guide content and dedicated `/guide/` experience   |
 
 ## Workspace Domain Model
 
@@ -195,6 +196,6 @@ Presence is deterministic fixture data with user identity, color, cursor address
 5. Keep external behavior behind an injected service interface.
 6. Derive every view from the shared document.
 7. Add domain, store and user-flow tests at the appropriate layer.
-8. Keep README, this guide, TypeDoc and the in-app architecture description aligned.
+8. Keep README, the published User Guide, this guide, TypeDoc and the in-app architecture description aligned without copying the same detail between them.
 
 See [AGENTS.md](../AGENTS.md) for the concise operational rules used by future coding agents.

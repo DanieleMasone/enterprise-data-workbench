@@ -1,5 +1,5 @@
-import { Command, Columns3, LayoutGrid } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { Command, LayoutGrid } from 'lucide-react';
+import { useCallback, useEffect } from 'react';
 import {
   CalendarView,
   CommandPalette,
@@ -11,6 +11,8 @@ import {
 import { useKeyboardShortcuts } from '../modules/workspace';
 import { WorkspaceStoreProvider, useWorkspaceSelector } from '../modules/workspace';
 import type { WorkspaceViewMode } from '../modules/workspace';
+import { UserGuidePage } from './guide/UserGuidePage';
+import { usePersistedTheme } from './theme';
 import {
   ArchitectureDiagram,
   CapabilityGrid,
@@ -19,16 +21,17 @@ import {
   QualityGateGrid,
   ResourceLinkGrid,
   SectionHeader,
+  SiteHeader,
   ThemeToggle,
   ViewTabs,
 } from './ui';
 
-type ThemeMode = 'light' | 'dark';
-
-const themeStorageKey = 'enterprise-data-workbench-theme';
-
 /** Root application shell for the enterprise data workbench. */
 export function App() {
+  if (isUserGuidePath(window.location.pathname)) {
+    return <UserGuidePage />;
+  }
+
   return (
     <WorkspaceStoreProvider>
       <WorkspaceApplication />
@@ -80,36 +83,31 @@ export function WorkspaceApplication() {
 
   return (
     <div className="app-shell" data-theme={theme}>
-      <header className="app-header">
-        <div className="brand-block">
-          <Columns3 size={22} aria-hidden="true" />
-          <div>
-            <h1>Enterprise Data Workbench</h1>
-            <p>Local-first operations with visible sync and reconciliation</p>
-          </div>
-        </div>
-
-        <div className="header-actions">
-          <span className="pending-badge" aria-label={`${pendingCount} pending operations`}>
-            {pendingCount} pending
-          </span>
-          <ThemeToggle
-            theme={theme}
-            onToggle={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-          />
-          <button
-            type="button"
-            className="command-button"
-            onClick={openCommandPalette}
-            aria-label="Open command palette"
-            aria-expanded={commandPaletteOpen}
-            aria-controls="workspace-command-palette"
-          >
-            <Command size={16} aria-hidden="true" />
-            <span>Command</span>
-          </button>
-        </div>
-      </header>
+      <SiteHeader
+        subtitle="Local-first operations with visible sync and reconciliation"
+        actions={
+          <>
+            <span className="pending-badge" aria-label={`${pendingCount} pending operations`}>
+              {pendingCount} pending
+            </span>
+            <ThemeToggle
+              theme={theme}
+              onToggle={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            />
+            <button
+              type="button"
+              className="command-button"
+              onClick={openCommandPalette}
+              aria-label="Open command palette"
+              aria-expanded={commandPaletteOpen}
+              aria-controls="workspace-command-palette"
+            >
+              <Command size={16} aria-hidden="true" />
+              <span>Command</span>
+            </button>
+          </>
+        }
+      />
 
       <main className="page-main">
         <HeroSection
@@ -170,22 +168,6 @@ function WorkbenchDemo({ activeView, setActiveView }: WorkbenchDemoProps) {
   );
 }
 
-function usePersistedTheme(): readonly [ThemeMode, (theme: ThemeMode) => void] {
-  const [theme, setThemeState] = useState<ThemeMode>(resolveInitialTheme);
-
-  const setTheme = useCallback((nextTheme: ThemeMode) => {
-    setThemeState(nextTheme);
-    window.localStorage.setItem(themeStorageKey, nextTheme);
-  }, []);
-
-  return [theme, setTheme];
-}
-
-function resolveInitialTheme(): ThemeMode {
-  const storedTheme = window.localStorage.getItem(themeStorageKey);
-  if (storedTheme === 'dark' || storedTheme === 'light') {
-    return storedTheme;
-  }
-
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+function isUserGuidePath(pathname: string): boolean {
+  return /\/guide\/?$/.test(pathname);
 }

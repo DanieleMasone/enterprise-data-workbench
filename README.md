@@ -1,13 +1,11 @@
 # Enterprise Data Workbench
 
 [![CI](https://github.com/danielemasone/enterprise-data-workbench/actions/workflows/ci.yml/badge.svg)](https://github.com/danielemasone/enterprise-data-workbench/actions/workflows/ci.yml)
-[![GitHub Pages](https://img.shields.io/badge/github--pages-live-success)](https://danielemasone.github.io/enterprise-data-workbench/)
-[![Coverage](https://img.shields.io/badge/coverage-available-informational)](https://danielemasone.github.io/enterprise-data-workbench/coverage/)
-[![API Docs](https://img.shields.io/badge/api-docs-blueviolet)](https://danielemasone.github.io/enterprise-data-workbench/docs/)
 
 Enterprise Data Workbench is a portfolio-grade React, TypeScript and Vite application for dense, local-first enterprise workflows. Table, kanban and calendar views share one domain document while optimistic operations, persistence, synchronization and conflicts remain visible and inspectable.
 
 - **Live demo:** [danielemasone.github.io/enterprise-data-workbench](https://danielemasone.github.io/enterprise-data-workbench/)
+- **User guide:** [published product documentation](https://danielemasone.github.io/enterprise-data-workbench/guide/)
 - **Source:** [github.com/danielemasone/enterprise-data-workbench](https://github.com/danielemasone/enterprise-data-workbench)
 - **API reference:** [generated TypeDoc](https://danielemasone.github.io/enterprise-data-workbench/docs/)
 - **Coverage:** [generated HTML report](https://danielemasone.github.io/enterprise-data-workbench/coverage/)
@@ -44,14 +42,14 @@ flowchart LR
   Operations --> Sync["Mock sync service"]
   Sync --> Reconcile["Reconciliation"]
   Reconcile --> Store
-  CI["GitHub Actions"] --> Pages["Vite app + TypeDoc + coverage"]
+  CI["GitHub Actions"] --> Pages["App + User Guide + TypeDoc + coverage"]
 ```
 
 The full runtime model, domain terminology and extension rules are documented in the [architecture guide](guides/architecture.md).
 
 ## Documentation
 
-- [User guide](guides/user-guide.md) - practical walkthrough of the published application.
+- [Published User Guide](https://danielemasone.github.io/enterprise-data-workbench/guide/) - end-user workflows, keyboard UX, sync and conflict resolution.
 - [Architecture guide](guides/architecture.md) - domain, state, persistence, sync and reconciliation design.
 - [Testing and CI guide](guides/testing-ci.md) - test ownership, coverage, Playwright and Pages delivery.
 - [Generated TypeDoc](https://danielemasone.github.io/enterprise-data-workbench/docs/) - exported TypeScript API reference.
@@ -81,15 +79,15 @@ npm run ci
 
 ## Key Scripts
 
-| Script                  | Purpose                                               |
-| ----------------------- | ----------------------------------------------------- |
-| `npm run dev`           | Start the Vite development server                     |
-| `npm run build`         | Build the GitHub Pages-ready application into `dist/` |
-| `npm run test:coverage` | Run Vitest and generate coverage reports              |
-| `npm run test:e2e`      | Build/preview the production app and run Playwright   |
-| `npm run docs`          | Generate TypeDoc into ignored `docs/` output          |
-| `npm run pages:reports` | Copy TypeDoc and coverage into the Pages artifact     |
-| `npm run ci`            | Run the complete local quality-gate sequence          |
+| Script                  | Purpose                                             |
+| ----------------------- | --------------------------------------------------- |
+| `npm run dev`           | Start the Vite development server                   |
+| `npm run build`         | Build the app and HTML User Guide into `dist/`      |
+| `npm run test:coverage` | Run Vitest and generate coverage reports            |
+| `npm run test:e2e`      | Build/preview the production app and run Playwright |
+| `npm run docs`          | Generate TypeDoc into ignored `docs/` output        |
+| `npm run pages:reports` | Copy TypeDoc and coverage into the Pages artifact   |
+| `npm run ci`            | Run the complete local quality-gate sequence        |
 
 ## Technical Trade-Offs
 

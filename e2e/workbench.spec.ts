@@ -36,10 +36,7 @@ test('loads the portfolio shell and exposes stable project links', async ({ page
   );
   await expect(
     page.getByRole('link', { name: 'User guide: Practical app walkthrough' }),
-  ).toHaveAttribute(
-    'href',
-    'https://github.com/danielemasone/enterprise-data-workbench/blob/main/guides/user-guide.md',
-  );
+  ).toHaveAttribute('href', `${appPath}guide/`);
   await expect(page.getByRole('link', { name: 'TypeDoc: Generated API docs' })).toHaveAttribute(
     'href',
     `${appPath}docs/`,
@@ -73,6 +70,44 @@ test('toggles dark mode and persists the chosen theme after reload', async ({ pa
   await page.reload();
 
   await expect(appShell).toHaveAttribute('data-theme', chosenTheme ?? '');
+});
+
+test('publishes an accessible User Guide with stable project resources', async ({ page }) => {
+  const criticalErrors = collectCriticalBrowserErrors(page);
+
+  await page.goto(`${appPath}guide/`);
+
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Enterprise Data Workbench User Guide' }),
+  ).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'User guide contents' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Architecture overview' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Table view' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'API documentation' })).toHaveAttribute(
+    'href',
+    `${appPath}docs/`,
+  );
+  await expect(page.getByRole('link', { name: 'Coverage report' })).toHaveAttribute(
+    'href',
+    `${appPath}coverage/`,
+  );
+  await expect(page.getByRole('link', { name: 'GitHub repository' })).toHaveAttribute(
+    'href',
+    'https://github.com/danielemasone/enterprise-data-workbench',
+  );
+  await expect(page.getByRole('link', { name: 'Workbench' })).toHaveAttribute('href', appPath);
+
+  const guideShell = page.locator('.app-shell');
+  await page.getByRole('button', { name: /Switch to (dark|light) mode/ }).click();
+  const chosenTheme = await guideShell.getAttribute('data-theme');
+  await page.reload();
+  await expect(guideShell).toHaveAttribute('data-theme', chosenTheme ?? '');
+
+  const hasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+  expect(criticalErrors).toEqual([]);
 });
 
 test('switches Table, Kanban and Calendar as accessible workbench tabs', async ({ page }) => {
@@ -197,4 +232,11 @@ test('keeps the mobile shell usable without page-level horizontal overflow', asy
   await page.getByRole('button', { name: /Switch to (dark|light) mode/ }).click();
   await expect(page.locator('.app-shell')).toHaveAttribute('data-theme', /dark|light/);
   await expect(page.getByRole('link', { name: 'Coverage: Generated test report' })).toBeVisible();
+
+  await page.goto(`${appPath}guide/`);
+  await expect(page.getByRole('link', { name: 'Workbench' })).toBeVisible();
+  const guideHasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+  );
+  expect(guideHasHorizontalOverflow).toBe(false);
 });
