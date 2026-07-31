@@ -153,8 +153,8 @@ export function GuideContent() {
       >
         <p>
           Each date section shows its record count, while each item shows title, owner and status.
-          Records without a usable date are omitted. Edit dates in Table and return to Calendar to
-          see the projection update.
+          Records without a usable date appear in an Unscheduled group. Edit dates in Table and
+          return to Calendar to see the projection update.
         </p>
       </GuideSection>
 

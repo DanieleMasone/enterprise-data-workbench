@@ -83,6 +83,7 @@ npm run ci
 | ----------------------- | --------------------------------------------------- |
 | `npm run dev`           | Start the Vite development server                   |
 | `npm run build`         | Build the app and HTML User Guide into `dist/`      |
+| `npm run format:check`  | Verify repository formatting without changing files |
 | `npm run test:coverage` | Run Vitest and generate coverage reports            |
 | `npm run test:e2e`      | Build/preview the production app and run Playwright |
 | `npm run docs`          | Generate TypeDoc into ignored `docs/` output        |

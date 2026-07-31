@@ -1,16 +1,8 @@
-import type {
-  WorkspaceConflict,
-  WorkspaceDocument,
-  WorkspaceOperation,
-  SyncResult,
-} from '../model';
+import type { WorkspaceConflict, WorkspaceOperation, SyncResult } from '../model';
 
 /** Synchronization boundary implemented by a mock service for local-first demos. */
 export interface WorkspaceSyncService {
-  readonly submitOperations: (
-    operations: readonly WorkspaceOperation[],
-    document: WorkspaceDocument,
-  ) => Promise<SyncResult>;
+  readonly submitOperations: (operations: readonly WorkspaceOperation[]) => Promise<SyncResult>;
 }
 
 /** Configuration for deterministic mock synchronization in app demos and tests. */
@@ -35,12 +27,7 @@ export class MockWorkspaceSyncService implements WorkspaceSyncService {
         `${prefix}-${Math.random().toString(36).slice(2, 8)}-${Date.now().toString(36)}`);
   }
 
-  async submitOperations(
-    operations: readonly WorkspaceOperation[],
-    document: WorkspaceDocument,
-  ): Promise<SyncResult> {
-    void document;
-
+  async submitOperations(operations: readonly WorkspaceOperation[]): Promise<SyncResult> {
     if (this.#delayMs > 0) {
       await new Promise<void>((resolve) => {
         globalThis.setTimeout(resolve, this.#delayMs);

@@ -1,6 +1,5 @@
 import type {
   WorkspaceOperation,
-  WorkspaceDocument,
   WorkspaceDependencies,
   PersistedWorkspace,
   SyncResult,
@@ -25,10 +24,6 @@ export class InMemoryWorkspacePersistence implements WorkspacePersistence {
     this.#snapshot = cloneWorkspace(workspace);
     this.savedSnapshots.push(cloneWorkspace(workspace));
   }
-
-  async clear(): Promise<void> {
-    this.#snapshot = null;
-  }
 }
 
 /** Deterministic sync test double with an overridable response factory. */
@@ -36,12 +31,7 @@ export class TestWorkspaceSyncService implements WorkspaceSyncService {
   submittedOperations: WorkspaceOperation[][] = [];
   nextResult: SyncResult | null = null;
 
-  async submitOperations(
-    operations: readonly WorkspaceOperation[],
-    document: WorkspaceDocument,
-  ): Promise<SyncResult> {
-    void document;
-
+  async submitOperations(operations: readonly WorkspaceOperation[]): Promise<SyncResult> {
     this.submittedOperations.push([...operations]);
     if (this.nextResult) {
       return this.nextResult;
@@ -82,5 +72,5 @@ export function createTestWorkspaceStore(snapshot: PersistedWorkspace | null = n
 }
 
 function cloneWorkspace(workspace: PersistedWorkspace): PersistedWorkspace {
-  return structuredClone(workspace) as PersistedWorkspace;
+  return structuredClone(workspace);
 }

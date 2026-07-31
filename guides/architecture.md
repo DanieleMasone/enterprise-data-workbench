@@ -60,7 +60,7 @@ The compact diagram in the README and the in-app diagram describe the same path 
 | `src/modules/workspace/state/`      | Zustand store, commands and React provider                  |
 | `src/modules/workspace/services/`   | Persistence, mock sync and reconciliation boundaries        |
 | `src/modules/workspace/components/` | Table, kanban, calendar, palette, presence and inspector UI |
-| `src/modules/workspace/hooks/`      | Keyboard and optimistic async orchestration                 |
+| `src/modules/workspace/hooks/`      | Global keyboard shortcut orchestration                      |
 | `src/app/`                          | Portfolio shell, shared theme/UI and published User Guide   |
 | `src/app/guide/`                    | End-user guide content and dedicated `/guide/` experience   |
 
@@ -153,7 +153,7 @@ Only serializable workspace data crosses this boundary. Selection, editing, pale
 
 ## Mock Synchronization
 
-`WorkspaceSyncService.submitOperations()` accepts pending operations and the current document. `MockWorkspaceSyncService` provides deterministic acknowledgements and conflict behavior without requiring a backend.
+`WorkspaceSyncService.submitOperations()` accepts the pending operation batch. `MockWorkspaceSyncService` provides deterministic acknowledgements and conflict behavior without requiring a backend.
 
 `flushSync` performs the orchestration:
 
@@ -183,7 +183,7 @@ Presence is deterministic fixture data with user identity, color, cursor address
 
 - Mock sync demonstrates boundaries and reconciliation, not distributed consistency.
 - Field-level conflicts are understandable and testable but do not cover multi-field merge policies.
-- The operation log is append-only for inspection; undo/redo is not exposed yet.
+- The operation log is append-only for inspection; undo/redo is outside the showcase scope.
 - The grid is not virtualized and targets moderate portfolio-sized datasets.
 - Calendar is a projection, not a scheduling engine.
 

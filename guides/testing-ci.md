@@ -93,6 +93,7 @@ Run individual checks:
 
 ```bash
 npm run typecheck
+npm run format:check
 npm run lint
 npm run test:coverage
 npm run build
@@ -119,7 +120,7 @@ Pull requests run:
 
 1. `npm ci` with the setup-node npm cache.
 2. Chromium installation through Playwright.
-3. Type checking and zero-warning linting.
+3. Formatting, type checking and zero-warning linting.
 4. Vitest coverage.
 5. The Vite production build, including the `/guide/` entry.
 6. TypeDoc generation.

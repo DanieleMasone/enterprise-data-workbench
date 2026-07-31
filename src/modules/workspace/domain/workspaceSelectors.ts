@@ -38,7 +38,7 @@ export function parseFieldValue(field: WorkspaceField, value: string): FieldValu
 
   if (field.type === 'number') {
     const numericValue = Number(trimmed);
-    return Number.isFinite(numericValue) ? numericValue : getNumberFallback(value);
+    return Number.isFinite(numericValue) ? numericValue : trimmed;
   }
 
   return trimmed;
@@ -180,10 +180,6 @@ function compareFieldValues(leftValue: FieldValue, rightValue: FieldValue): numb
     return leftValue - rightValue;
   }
   return collator.compare(String(leftValue), String(rightValue));
-}
-
-function getNumberFallback(value: string): string {
-  return value.trim();
 }
 
 function clampIndex(index: number, length: number): number {

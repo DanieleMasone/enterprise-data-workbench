@@ -20,7 +20,6 @@ class WorkspaceDatabase extends Dexie {
 export interface WorkspacePersistence {
   readonly load: () => Promise<PersistedWorkspace | null>;
   readonly save: (workspace: PersistedWorkspace) => Promise<void>;
-  readonly clear: () => Promise<void>;
 }
 
 /** Dexie-backed implementation for local-first workspace state. */
@@ -54,9 +53,5 @@ export class DexieWorkspacePersistence implements WorkspacePersistence {
       id: this.#workspaceId,
       ...workspace,
     });
-  }
-
-  async clear(): Promise<void> {
-    await this.#database.workspaces.delete(this.#workspaceId);
   }
 }

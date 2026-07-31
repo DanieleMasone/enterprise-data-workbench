@@ -33,7 +33,7 @@ import {
 export type WorkspaceStoreHook = UseBoundStore<StoreApi<WorkspaceStore>>;
 
 /** Converts a store state into the serializable persistence payload. */
-export function toPersistedWorkspace(state: WorkspaceState): PersistedWorkspace {
+function toPersistedWorkspace(state: WorkspaceState): PersistedWorkspace {
   return {
     fields: state.fields,
     fieldOrder: state.fieldOrder,
@@ -45,7 +45,7 @@ export function toPersistedWorkspace(state: WorkspaceState): PersistedWorkspace 
 }
 
 /** Default services used by the browser app; tests inject deterministic mocks. */
-export function createDefaultWorkspaceDependencies(): WorkspaceDependencies {
+function createDefaultWorkspaceDependencies(): WorkspaceDependencies {
   return {
     clientId: 'local-client',
     now: () => new Date().toISOString(),
@@ -76,14 +76,17 @@ export function createWorkspaceStore(
       >,
     ): Promise<void> => {
       const nextDocument = applyOperation(get(), operation);
-      set((state) => ({
-        ...nextDocument,
-        operationLog: [...state.operationLog, operation],
-        sync: {
-          ...state.sync,
-          pendingCount: state.sync.pendingCount + 1,
-        },
-      }));
+      set((state) => {
+        const operationLog = [...state.operationLog, operation];
+        return {
+          ...nextDocument,
+          operationLog,
+          sync: {
+            ...state.sync,
+            pendingCount: countPendingOperations(operationLog),
+          },
+        };
+      });
       await persist();
     };
 
@@ -297,8 +300,7 @@ export function createWorkspaceStore(
         }));
 
         try {
-          const latest = get();
-          const result = await dependencies.syncService.submitOperations(pendingOperations, latest);
+          const result = await dependencies.syncService.submitOperations(pendingOperations);
           const reconciled = reconcileSyncResult(get(), result);
           set(reconciled);
           await persist();
@@ -334,21 +336,24 @@ export function createWorkspaceStore(
           createdAt: dependencies.now(),
         });
 
-        set((current) => ({
-          conflicts: [...current.conflicts, conflict],
-          operationLog: pendingOperation
+        set((current) => {
+          const operationLog = pendingOperation
             ? current.operationLog.map((operation) =>
-              operation.id === pendingOperation.id
-                ? { ...operation, status: 'conflicted' }
-                : operation,
-            )
-            : current.operationLog,
-          sync: {
-            ...current.sync,
-            pendingCount: current.operationLog.filter((operation) => operation.status === 'pending')
-              .length,
-          },
-        }));
+                operation.id === pendingOperation.id
+                  ? { ...operation, status: 'conflicted' as const }
+                  : operation,
+              )
+            : current.operationLog;
+
+          return {
+            conflicts: [...current.conflicts, conflict],
+            operationLog,
+            sync: {
+              ...current.sync,
+              pendingCount: countPendingOperations(operationLog),
+            },
+          };
+        });
       },
 
       resolveConflict: async (conflictId, resolution) => {
@@ -439,4 +444,8 @@ function createRandomId(): string {
   }
 
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function countPendingOperations(operations: WorkspaceState['operationLog']): number {
+  return operations.filter((operation) => operation.status === 'pending').length;
 }

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { createInitialWorkspace } from '../data/initialWorkspace';
 import type { WorkspaceOperation } from '../model';
 import { MockWorkspaceSyncService } from './sync.service';
 
@@ -12,7 +11,7 @@ describe('mock workspace sync service', () => {
     });
     const operation = createCellOperation('Updated owner');
 
-    const result = await service.submitOperations([operation], createInitialWorkspace());
+    const result = await service.submitOperations([operation]);
 
     expect(result.acknowledgedOperationIds).toEqual(['op-1']);
     expect(result.conflicts).toHaveLength(0);
@@ -27,7 +26,7 @@ describe('mock workspace sync service', () => {
     });
     const operation = createCellOperation('Needs conflict review');
 
-    const result = await service.submitOperations([operation], createInitialWorkspace());
+    const result = await service.submitOperations([operation]);
 
     expect(result.acknowledgedOperationIds).toEqual([]);
     expect(result.conflicts[0]).toMatchObject({
@@ -59,7 +58,7 @@ describe('mock workspace sync service', () => {
       baseVersion: 3,
     };
 
-    const result = await service.submitOperations([operation], createInitialWorkspace());
+    const result = await service.submitOperations([operation]);
 
     expect(result.conflicts[0]?.fieldId).toBe('status');
     expect(result.conflicts[0]?.remoteValue).toBe('Delivery');

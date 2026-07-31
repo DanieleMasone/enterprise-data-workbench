@@ -121,12 +121,12 @@ const qualityGates = [
   ['TypeDoc', 'Generated API reference shipped with Pages'],
 ] as const;
 
-export interface ThemeToggleProps {
+interface ThemeToggleProps {
   readonly theme: 'light' | 'dark';
   readonly onToggle: () => void;
 }
 
-export interface SiteHeaderProps {
+interface SiteHeaderProps {
   readonly title?: string;
   readonly subtitle: string;
   readonly actions: ReactNode;
@@ -174,7 +174,7 @@ export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
   );
 }
 
-export interface SectionHeaderProps {
+interface SectionHeaderProps {
   readonly id: string;
   readonly eyebrow?: string;
   readonly icon: LucideIcon;
@@ -209,7 +209,7 @@ export function SectionHeader({
   );
 }
 
-export interface ViewTabsProps {
+interface ViewTabsProps {
   readonly activeView: WorkspaceViewMode;
   readonly onChange: (view: WorkspaceViewMode) => void;
 }
@@ -291,7 +291,7 @@ export function ViewTabs({ activeView, onChange }: ViewTabsProps) {
   );
 }
 
-export interface HeroSectionProps {
+interface HeroSectionProps {
   readonly recordCount: number;
   readonly operationCount: number;
   readonly pendingCount: number;
@@ -350,7 +350,7 @@ export function CapabilityGrid() {
   );
 }
 
-export interface ArchitectureDiagramProps {
+interface ArchitectureDiagramProps {
   readonly id?: string;
   readonly title?: string;
   readonly description?: string;

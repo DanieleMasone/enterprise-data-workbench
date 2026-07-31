@@ -8,9 +8,7 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import { useEffect, useMemo, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import { getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table';
 import {
-  findField,
   formatFieldValue,
   getCellValue,
   getOpenConflictsForCell,
@@ -18,7 +16,7 @@ import {
   getPendingOperationsForCell,
   sortRecords,
 } from '../../domain';
-import type { FieldValue, WorkbenchRecord, WorkspaceField } from '../../model';
+import type { FieldValue, WorkspaceField } from '../../model';
 import { useWorkspaceSelector } from '../../state';
 
 /** Dense table grid with inline editing, layout controls, selection, sorting, and keyboard navigation. */
@@ -48,22 +46,6 @@ export function DataGrid() {
     [fields, fieldOrder],
   );
   const sortedRecords = useMemo(() => sortRecords(records, sort), [records, sort]);
-
-  const columns = useMemo<ColumnDef<WorkbenchRecord>[]>(
-    () =>
-      orderedFields.map((field) => ({
-        id: field.id,
-        header: field.label,
-        accessorFn: (record) => getCellValue(record, field.id),
-      })),
-    [orderedFields],
-  );
-
-  const table = useReactTable({
-    data: sortedRecords,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
 
   useEffect(() => {
     if (editingCell) {
@@ -158,6 +140,20 @@ export function DataGrid() {
     document.addEventListener('pointerup', handleUp);
   };
 
+  const handleColumnResizeKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    field: WorkspaceField,
+  ): void => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    const direction = event.key === 'ArrowLeft' ? -1 : 1;
+    void resizeColumn(field.id, field.width + direction * 16);
+  };
+
   return (
     <section className="workspace-view" aria-label="Table view">
       <div className="grid-toolbar">
@@ -179,19 +175,23 @@ export function DataGrid() {
       <div className="data-grid-shell" onKeyDown={handleGridKeyDown}>
         <table className="data-grid" role="grid" aria-rowcount={sortedRecords.length}>
           <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
+            <tr>
               <th className="row-selector-header" scope="col" aria-label="Row selection" />
-              {headerGroup.headers.map((header) => {
-                const field = findField(orderedFields, header.column.id);
-                if (!field) {
-                  return null;
-                }
+              {orderedFields.map((field, fieldIndex) => {
                 const width = draftWidths[field.id] ?? field.width;
                 const isSorted = sort?.fieldId === field.id;
+                const isFirstColumn = fieldIndex === 0;
+                const isLastColumn = fieldIndex === orderedFields.length - 1;
 
                 return (
-                  <th key={field.id} scope="col" style={{ width, minWidth: field.minWidth }}>
+                  <th
+                    key={field.id}
+                    scope="col"
+                    aria-sort={
+                      isSorted ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none'
+                    }
+                    style={{ width, minWidth: field.minWidth }}
+                  >
                     <div className="column-header">
                       <button
                         type="button"
@@ -207,16 +207,22 @@ export function DataGrid() {
                           <ArrowUpZA size={15} aria-hidden="true" />
                         )}
                       </button>
-                      <div
-                        className="column-actions"
-                        aria-label={`${field.label} column controls`}
-                      >
+                      <div className="column-actions" aria-label={`${field.label} column controls`}>
                         <button
                           type="button"
                           className="icon-button"
                           onClick={() => moveColumnLeft(field)}
-                          aria-label={`Move ${field.label} left`}
-                          title={`Move ${field.label} left`}
+                          aria-label={
+                            isFirstColumn
+                              ? `${field.label} is already the first column`
+                              : `Move ${field.label} left`
+                          }
+                          title={
+                            isFirstColumn
+                              ? `${field.label} is already the first column`
+                              : `Move ${field.label} left`
+                          }
+                          disabled={isFirstColumn}
                         >
                           <ChevronLeft size={15} aria-hidden="true" />
                         </button>
@@ -224,8 +230,17 @@ export function DataGrid() {
                           type="button"
                           className="icon-button"
                           onClick={() => moveColumnRight(field)}
-                          aria-label={`Move ${field.label} right`}
-                          title={`Move ${field.label} right`}
+                          aria-label={
+                            isLastColumn
+                              ? `${field.label} is already the last column`
+                              : `Move ${field.label} right`
+                          }
+                          title={
+                            isLastColumn
+                              ? `${field.label} is already the last column`
+                              : `Move ${field.label} right`
+                          }
+                          disabled={isLastColumn}
                         >
                           <ChevronRight size={15} aria-hidden="true" />
                         </button>
@@ -233,8 +248,9 @@ export function DataGrid() {
                           type="button"
                           className="resize-handle"
                           onPointerDown={(event) => beginColumnResize(event, field)}
-                          aria-label={`Resize ${field.label}`}
-                          title={`Resize ${field.label}`}
+                          onKeyDown={(event) => handleColumnResizeKeyDown(event, field)}
+                          aria-label={`Resize ${field.label} with arrow keys`}
+                          title={`Drag or use arrow keys to resize ${field.label}`}
                         >
                           <GripVertical size={14} aria-hidden="true" />
                         </button>
@@ -244,81 +260,79 @@ export function DataGrid() {
                 );
               })}
             </tr>
-          ))}
           </thead>
           <tbody>
-          {table.getRowModel().rows.map((row) => {
-            const record = row.original;
-            const isSelectedRecord = selection.selectedRecordIds.includes(record.id);
+            {sortedRecords.map((record) => {
+              const isSelectedRecord = selection.selectedRecordIds.includes(record.id);
 
-            return (
-              <tr key={record.id} aria-selected={isSelectedRecord}>
-                <td className="row-selector-cell">
-                  <input
-                    type="checkbox"
-                    aria-label={`Select ${formatFieldValue(getCellValue(record, 'title'))}`}
-                    checked={isSelectedRecord}
-                    onChange={() => toggleRecordSelection(record.id)}
-                  />
-                </td>
-                {orderedFields.map((field) => {
-                  const cell = { recordId: record.id, fieldId: field.id };
-                  const value = getCellValue(record, field.id);
-                  const selected =
-                    selection.selectedCell.recordId === record.id &&
-                    selection.selectedCell.fieldId === field.id;
-                  const editing =
-                    editingCell?.recordId === record.id && editingCell.fieldId === field.id;
-                  const openConflicts = getOpenConflictsForCell(conflicts, cell);
-                  const pendingOperations = getPendingOperationsForCell(operationLog, cell);
+              return (
+                <tr key={record.id} aria-selected={isSelectedRecord}>
+                  <td className="row-selector-cell">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${formatFieldValue(getCellValue(record, 'title'))}`}
+                      checked={isSelectedRecord}
+                      onChange={() => toggleRecordSelection(record.id)}
+                    />
+                  </td>
+                  {orderedFields.map((field) => {
+                    const cell = { recordId: record.id, fieldId: field.id };
+                    const value = getCellValue(record, field.id);
+                    const selected =
+                      selection.selectedCell.recordId === record.id &&
+                      selection.selectedCell.fieldId === field.id;
+                    const editing =
+                      editingCell?.recordId === record.id && editingCell.fieldId === field.id;
+                    const openConflicts = getOpenConflictsForCell(conflicts, cell);
+                    const pendingOperations = getPendingOperationsForCell(operationLog, cell);
 
-                  return (
-                    <td
-                      key={field.id}
-                      role="gridcell"
-                      tabIndex={selected && !editing ? 0 : -1}
-                      aria-selected={selected}
-                      data-cell-id={`${record.id}:${field.id}`}
-                      data-testid={`grid-cell-${record.id}-${field.id}`}
-                      className={[
-                        selected ? 'is-selected' : '',
-                        openConflicts.length > 0 ? 'has-conflict' : '',
-                        pendingOperations.length > 0 ? 'has-pending' : '',
-                      ]
-                        .filter(Boolean)
-                        .join(' ')}
-                      onFocus={() => selectCell(cell)}
-                      onClick={() => selectCell(cell)}
-                      onDoubleClick={() => startEditing(cell)}
-                    >
-                      {editing ? (
-                        <InlineEditor
-                          value={editingCell.draftValue}
-                          onChange={updateEditingDraft}
-                          onCommit={() => {
-                            void commitEditing();
-                          }}
-                          onCancel={cancelEditing}
-                        />
-                      ) : (
-                        <CellDisplay field={field} value={value} />
-                      )}
-                      {pendingOperations.length > 0 ? (
-                        <span className="cell-state-dot" aria-label="Pending operation" />
-                      ) : null}
-                      {openConflicts.length > 0 ? (
-                        <TriangleAlert
-                          className="cell-conflict-icon"
-                          size={15}
-                          aria-label="Conflict"
-                        />
-                      ) : null}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
+                    return (
+                      <td
+                        key={field.id}
+                        role="gridcell"
+                        tabIndex={selected && !editing ? 0 : -1}
+                        aria-selected={selected}
+                        data-cell-id={`${record.id}:${field.id}`}
+                        data-testid={`grid-cell-${record.id}-${field.id}`}
+                        className={[
+                          selected ? 'is-selected' : '',
+                          openConflicts.length > 0 ? 'has-conflict' : '',
+                          pendingOperations.length > 0 ? 'has-pending' : '',
+                        ]
+                          .filter(Boolean)
+                          .join(' ')}
+                        onFocus={() => selectCell(cell)}
+                        onClick={() => selectCell(cell)}
+                        onDoubleClick={() => startEditing(cell)}
+                      >
+                        {editing ? (
+                          <InlineEditor
+                            value={editingCell.draftValue}
+                            onChange={updateEditingDraft}
+                            onCommit={() => {
+                              void commitEditing();
+                            }}
+                            onCancel={cancelEditing}
+                          />
+                        ) : (
+                          <CellDisplay field={field} value={value} />
+                        )}
+                        {pendingOperations.length > 0 ? (
+                          <span className="cell-state-dot" aria-label="Pending operation" />
+                        ) : null}
+                        {openConflicts.length > 0 ? (
+                          <TriangleAlert
+                            className="cell-conflict-icon"
+                            size={15}
+                            aria-label="Conflict"
+                          />
+                        ) : null}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

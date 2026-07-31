@@ -502,10 +502,9 @@ button:disabled {
 
 .architecture-flow {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) auto minmax(140px, 1fr) auto minmax(
-      140px,
-      1fr
-    ) auto minmax(140px, 1fr);
+  grid-template-columns:
+    minmax(120px, 1fr) auto minmax(140px, 1fr) auto minmax(140px, 1fr)
+    auto minmax(140px, 1fr);
   align-items: stretch;
   gap: 8px;
 }

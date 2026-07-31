@@ -13,9 +13,9 @@ export interface WorkspaceStoreProviderProps {
 
 /** Provides an injectable workspace store so UI tests can use isolated state. */
 export function WorkspaceStoreProvider({
-                                         children,
-                                         store = useWorkspaceStore,
-                                       }: WorkspaceStoreProviderProps) {
+  children,
+  store = useWorkspaceStore,
+}: WorkspaceStoreProviderProps) {
   return <WorkspaceStoreContext.Provider value={store}>{children}</WorkspaceStoreContext.Provider>;
 }
 

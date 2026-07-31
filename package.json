@@ -18,12 +18,12 @@
     "docs": "typedoc",
     "pages:reports": "node scripts/copy-pages-reports.mjs",
     "format": "prettier . --write",
-    "ci": "npm run typecheck && npm run lint && npm run test:coverage && npm run build && npm run docs && npm run test:e2e && npm run pages:reports"
+    "format:check": "prettier . --check",
+    "ci": "npm run format:check && npm run typecheck && npm run lint && npm run test:coverage && npm run build && npm run docs && npm run test:e2e && npm run pages:reports"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/utilities": "^3.2.2",
-    "@tanstack/react-table": "^8.21.3",
     "dexie": "^4.0.11",
     "lucide-react": "^1.16.0",
     "react": "^19.2.6",
@@ -51,7 +51,7 @@
     "typedoc": "^0.28.19",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.4",
-    "vite": "^8.0.14",
+    "vite": "^8.2.0",
     "vitest": "^4.1.7"
   }
 }

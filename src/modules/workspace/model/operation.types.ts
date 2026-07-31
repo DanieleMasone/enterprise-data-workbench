@@ -56,6 +56,9 @@ export type WorkspaceOperation =
   | ColumnReorderOperation;
 
 /** Remote operations reuse the same mutation grammar but are already reconciled. */
-export type RemoteWorkspaceOperation = Omit<WorkspaceOperation, 'status'> & {
-  readonly status: 'acknowledged';
-};
+export type RemoteWorkspaceOperation = {
+  [Type in WorkspaceOperation['type']]: Omit<
+    Extract<WorkspaceOperation, { readonly type: Type }>,
+    'status'
+  > & { readonly status: 'acknowledged' };
+}[WorkspaceOperation['type']];

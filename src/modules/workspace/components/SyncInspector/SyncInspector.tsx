@@ -1,7 +1,5 @@
 import { Check, RefreshCw, RotateCcw, ServerCog, TriangleAlert } from 'lucide-react';
-import { useCallback } from 'react';
 import { formatFieldValue } from '../../domain';
-import { useOptimisticMutation } from '../../hooks';
 import { useWorkspaceSelector } from '../../state';
 
 /** Inspector for explicit sync state, pending operations, and conflict resolution. */
@@ -13,7 +11,6 @@ export function SyncInspector() {
   const resolveConflict = useWorkspaceSelector((store) => store.resolveConflict);
   const selectedCell = useWorkspaceSelector((store) => store.selection.selectedCell);
   const simulateRemoteConflict = useWorkspaceSelector((store) => store.simulateRemoteConflict);
-  const syncMutation = useOptimisticMutation(useCallback(() => flushSync(), [flushSync]));
   const pendingOperations = operationLog.filter((operation) => operation.status === 'pending');
   const recentOperations = operationLog.slice(-6).reverse();
   const openConflicts = conflicts.filter((conflict) => conflict.status === 'open');
@@ -48,9 +45,9 @@ export function SyncInspector() {
           type="button"
           className="primary-action"
           onClick={() => {
-            void syncMutation.run();
+            void flushSync();
           }}
-          disabled={syncMutation.isPending || pendingOperations.length === 0}
+          disabled={sync.mode === 'syncing' || pendingOperations.length === 0}
         >
           <RefreshCw size={15} aria-hidden="true" />
           Sync
@@ -71,9 +68,7 @@ export function SyncInspector() {
         </button>
       </div>
 
-      {sync.error || syncMutation.error ? (
-        <p className="sync-error">{sync.error ?? syncMutation.error}</p>
-      ) : null}
+      {sync.error ? <p className="sync-error">{sync.error}</p> : null}
 
       <section className="inspector-section" aria-label="Pending operations">
         <h3>Pending operations</h3>

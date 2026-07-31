@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-export type ThemeMode = 'light' | 'dark';
+type ThemeMode = 'light' | 'dark';
 
 const themeStorageKey = 'enterprise-data-workbench-theme';
 

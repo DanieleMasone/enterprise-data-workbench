@@ -14,6 +14,8 @@ export function CommandPalette() {
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   const commands = useMemo<WorkspaceCommand[]>(
     () => [
@@ -74,13 +76,19 @@ export function CommandPalette() {
       return undefined;
     }
 
+    previouslyFocusedRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const timeoutId = window.setTimeout(() => {
       setQuery('');
       setActiveIndex(0);
       inputRef.current?.focus();
     }, 0);
 
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      window.clearTimeout(timeoutId);
+      previouslyFocusedRef.current?.focus();
+      previouslyFocusedRef.current = null;
+    };
   }, [open]);
 
   if (!open) {
@@ -93,12 +101,6 @@ export function CommandPalette() {
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      setOpen(false);
-      return;
-    }
-
     if (event.key === 'ArrowDown') {
       event.preventDefault();
       setActiveIndex((index) => Math.min(index + 1, visibleCommands.length - 1));
@@ -120,6 +122,33 @@ export function CommandPalette() {
     }
   };
 
+  const handleDialogKeyDown = (event: KeyboardEvent<HTMLElement>): void => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setOpen(false);
+      return;
+    }
+
+    if (event.key !== 'Tab' || !dialogRef.current) {
+      return;
+    }
+
+    const focusableElements = [...dialogRef.current.querySelectorAll<HTMLElement>('input, button')];
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements.at(-1);
+    if (!firstElement || !lastElement) {
+      return;
+    }
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  };
+
   return (
     <div
       className="command-palette-backdrop"
@@ -127,11 +156,13 @@ export function CommandPalette() {
       onMouseDown={() => setOpen(false)}
     >
       <section
+        ref={dialogRef}
         id="workspace-command-palette"
         className="command-palette"
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
+        onKeyDown={handleDialogKeyDown}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="command-palette-search">

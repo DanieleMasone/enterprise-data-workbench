@@ -21,12 +21,12 @@ describe('workspace store', () => {
       records: seeded.records.map((record, index) =>
         index === 0
           ? {
-            ...record,
-            cells: {
-              ...record.cells,
-              owner: 'Loaded owner',
-            },
-          }
+              ...record,
+              cells: {
+                ...record.cells,
+                owner: 'Loaded owner',
+              },
+            }
           : record,
       ),
     };
@@ -118,6 +118,17 @@ describe('workspace store', () => {
     expect(store.getState().operationLog[0]?.status).toBe('conflicted');
     expect(store.getState().conflicts[0]?.status).toBe('open');
     expect(store.getState().records[0]?.cells.title).toBe('Local conflict title');
+  });
+
+  it('derives pending count after a local operation becomes conflicted', async () => {
+    const { store } = createTestWorkspaceStore();
+    await store.getState().hydrate();
+    await store.getState().updateCell('rec-analytics-migration', 'owner', 'Local owner');
+
+    store.getState().simulateRemoteConflict('rec-analytics-migration', 'owner', 'Remote owner');
+
+    expect(store.getState().operationLog[0]?.status).toBe('conflicted');
+    expect(store.getState().sync.pendingCount).toBe(0);
   });
 
   it('moves kanban cards by writing a status operation against the shared record', async () => {

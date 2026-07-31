@@ -58,7 +58,7 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 ## CI/CD Expectations
 
 - `npm run ci` should remain the local validation equivalent of CI.
-- GitHub Actions must run install, Playwright browser install, typecheck, lint, coverage, build, docs and Playwright E2E.
+- GitHub Actions must run install, Playwright browser install, formatting, typecheck, lint, coverage, build, docs and Playwright E2E.
 - Pages deployments must publish the Vite `dist/` artifact from CI and include `dist/guide/`, generated `dist/docs/` and generated `dist/coverage/`.
 - Keep the workflow simple: one validation/build job, one Pages deploy job, and deployment only from non-PR `main` runs.
 - Upload Playwright reports as short-retention CI artifacts on failure; keep `playwright-report/`, `test-results/` and traces out of git.
@@ -104,4 +104,4 @@ Operational guidance for future AI coding agents maintaining Enterprise Data Wor
 4. Render the feature from derived workspace state.
 5. Add tests for domain logic, state mutation and the user-facing workflow.
 6. Remove temporary code, dead exports, stale TODOs, generated artifacts and misleading documentation claims.
-7. Run `npm run typecheck`, `npm run lint`, `npm run test:coverage`, `npm run build`, `npm run docs` and `npm run test:e2e`.
+7. Run `npm run format:check`, `npm run typecheck`, `npm run lint`, `npm run test:coverage`, `npm run build`, `npm run docs` and `npm run test:e2e`.

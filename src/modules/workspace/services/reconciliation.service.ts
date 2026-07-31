@@ -1,10 +1,4 @@
-import type {
-  FieldValue,
-  SyncResult,
-  WorkspaceConflict,
-  WorkspaceOperation,
-  WorkspaceState,
-} from '../model';
+import type { FieldValue, SyncResult, WorkspaceConflict, WorkspaceState } from '../model';
 import { applyOperation, markOperations, updateRecordCell } from '../domain';
 
 /** Reconciliation output contains only the state slices affected by sync decisions. */
@@ -32,7 +26,7 @@ export function reconcileSyncResult(
   const mergedConflicts = mergeConflicts(state.conflicts, result.conflicts);
 
   const remoteDocument = result.remoteOperations.reduce(
-    (document, operation) => applyOperation(document, operation as WorkspaceOperation),
+    (document, operation) => applyOperation(document, operation),
     {
       fields: state.fields,
       fieldOrder: state.fieldOrder,
@@ -75,12 +69,12 @@ export function resolveWorkspaceConflict(
   const nextRecords =
     resolution === 'remote'
       ? updateRecordCell(
-        state.records,
-        conflict.recordId,
-        conflict.fieldId,
-        conflict.remoteValue,
-        resolvedAt,
-      )
+          state.records,
+          conflict.recordId,
+          conflict.fieldId,
+          conflict.remoteValue,
+          resolvedAt,
+        )
       : state.records;
 
   const nextOperationStatus = resolution === 'remote' ? 'reverted' : 'acknowledged';
