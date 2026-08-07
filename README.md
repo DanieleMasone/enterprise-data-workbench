@@ -100,3 +100,9 @@ npm run ci
 ## Project Status
 
 Stable portfolio showcase. The implemented product, automated tests, generated reports and documentation are aligned with the deployed GitHub Pages application.
+
+## License
+
+Released under the MIT License. See [LICENSE](LICENSE).
+
+Copyright (c) 2026 Daniele Masone.
